@@ -18,7 +18,7 @@ void loop()
 
 int ping(int pingPin)
 {
-  int duration, cm;
+  long duration, cm;
   
   //Sound ping triggered by HIGH pulse of 2 us or more
   pinMode(pingPin, OUTPUT);
