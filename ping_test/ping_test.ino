@@ -6,26 +6,37 @@ const unsigned int MAX_DIST = 200; //Max distance in cm
 //Don't edit
 const unsigned int TIMEOUT_DIST = MAX_DIST*29*2; //Will change based on speed of sound, DO NOT USE IN PRODUCTION
 
+const byte bufferSize = 50;
+float buffer1[bufferSize];
+float buffer2[bufferSize];
+byte buffer1Pos = 0;
+byte buffer2Pos = 0;
+
 void setup()
 {
-  Serial.begin(9600);
- 
-  
+  Serial.begin(9600); 
 }
 
 void loop()
 {
-  float  cm = ping(pingPin);
-  //float  cm2 = ping(pingPin2);
- 
-  
-  Serial.print(cm);
-  Serial.print(", ");
-  //Serial.print(" ");
-  //Serial.print(cm2);
-  //Serial.println("");
+  Serial.print(addToBuffer(buffer1, &buffer1Pos, ping(pingPin)));
+  Serial.print("\t");
+  delay(5);
+  Serial.println(addToBuffer(buffer2, &buffer2Pos, ping(pingPin2)));
+  delay(5);
+}
 
-  delay(10);
+float addToBuffer(float * buffer, byte * bufferPos, float value){
+  buffer[*bufferPos] = value;
+  (*bufferPos)++;
+  if(*bufferPos >= bufferSize){
+    *bufferPos = 0;
+  }
+  float avg = 0;
+  for(byte i = 0; i < bufferSize; i++){
+    avg += buffer[i];
+  }
+  return avg / bufferSize;
 }
 
 /*
