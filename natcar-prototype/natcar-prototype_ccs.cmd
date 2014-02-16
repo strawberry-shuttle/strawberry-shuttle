@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * blinky_ccs.cmd - CCS linker configuration file for blinky.
+ * qs-rgb_ccs.cmd - CCS linker configuration file for qs-rgb.
  *
  * Copyright (c) 2012-2013 Texas Instruments Incorporated.  All rights reserved.
  * Software License Agreement
@@ -67,4 +67,4 @@ SECTIONS
     .stack  :   > SRAM
 }
 
-__STACK_TOP = __stack + 256;
+__STACK_TOP = __stack + 2048;
