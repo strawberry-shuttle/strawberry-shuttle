@@ -20,12 +20,12 @@ int main(void){
 	SysCtlClockSet(SYSCTL_SYSDIV_1 | SYSCTL_USE_OSC | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
 	//Configure PWM Clock to match system
-	SysCtlPWMClockSet(SYSCTL_PWMDIV_1);
+	SysCtlPWMClockSet(SYSCTL_PWMDIV_16);
 
 	// Enable the peripherals used by this program.
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);
 	SysCtlPeripheralEnable(SYSCTL_PERIPH_PWM1);
-	ulPeriod = SysCtlClockGet() / 200 * 4; //PWM frequency 200HZ
+	ulPeriod = SysCtlClockGet() / 106; //PWM frequency 50HZ
 
 	//Configure PD0 and PD1 Pins as PWM
 	GPIOPinConfigure(GPIO_PD0_M1PWM0);
@@ -39,9 +39,9 @@ int main(void){
 	//Set the Period (expressed in clock ticks)
 	PWMGenPeriodSet(PWM1_BASE, PWM_GEN_0, ulPeriod);
 
-	//Set PWM duty-50% (Period /2)
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0,ulPeriod/17);
-	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1,ulPeriod/13);
+	//Set PWM duty-50%
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_0,ulPeriod/125);
+	PWMPulseWidthSet(PWM1_BASE, PWM_OUT_1,ulPeriod/82);
 
 	// Enable the PWM generator
 	PWMGenEnable(PWM1_BASE, PWM_GEN_0);
