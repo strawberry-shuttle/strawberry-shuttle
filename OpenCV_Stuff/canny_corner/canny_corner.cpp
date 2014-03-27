@@ -15,11 +15,9 @@ int ratio = 3;
 int kernel_size = 3;
 char* window_name = "Edge Map";
 
-/**
- * @function CannyThreshold
- * @brief Trackbar callback - Canny thresholds input with a ratio 1:3
- */
-void CannyThreshold(int, void*)
+double k = 1.0/100000;
+
+void CannyCorner(int, void*)
 {
   /// Reduce noise with a kernel 3x3
   blur( src_gray, detected_edges, Size(3,3) );
@@ -27,10 +25,12 @@ void CannyThreshold(int, void*)
   /// Canny detector
   Canny( detected_edges, detected_edges, 147, 147, kernel_size );
 
-  /// Using Canny's output as a mask, we display our result
-  dst = Scalar::all(0);
 
-  src.copyTo( dst, detected_edges);
+  //Use Harris corner detection to pinpoint what we want (the convergence point)
+  cornerHarris(detected_edges, dst, 2, 3, k, BORDER_DEFAULT);
+
+
+//  src.copyTo( dst, detected_edges);
   imshow( window_name, dst );
  }
 
@@ -54,10 +54,10 @@ int main( int argc, char** argv )
   namedWindow( window_name, CV_WINDOW_AUTOSIZE );
 
   /// Show the image
-  CannyThreshold(0, 0);
+  CannyCorner(0, 0);
 
   /// Wait until user exit program by pressing a key
   waitKey(0);
 
   return 0;
-  }
+}
