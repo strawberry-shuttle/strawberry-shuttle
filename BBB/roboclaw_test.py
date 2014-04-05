@@ -16,8 +16,7 @@ print "Roboclaw Example 1\r\n"
 robo = Roboclaw(0x80, "/dev/ttyO1")
 
 #Get version string
-robo.send_command(128, 21)
-rcv = robo.port.read(32)
+rcv = robo.read_version()
 print repr(rcv)
 
 cnt = 0
