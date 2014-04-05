@@ -1,638 +1,583 @@
-import serial
 import struct
-import time
-
-checksum = 0
-
-def sendcommand(address,command):
-	global checksum
-	checksum = address
-	port.write(chr(address));
-	checksum += command
-	port.write(chr(command));
-	return;
-
-def readbyte():
-	global checksum
-	val = struct.unpack('>B',port.read(1));
-	checksum += val[0]
-	return val[0];	
-def readsbyte():
-	global checksum
-	val = struct.unpack('>b',port.read(1));
-	checksum += val[0]
-	return val[0];	
-def readword():
-	global checksum
-	val = struct.unpack('>H',port.read(2));
-	checksum += (val[0]&0xFF)
-	checksum += (val[0]>>8)&0xFF
-	return val[0];	
-def readsword():
-	global checksum
-	val = struct.unpack('>h',port.read(2));
-	checksum += val[0]
-	checksum += (val[0]>>8)&0xFF
-	return val[0];	
-def readlong():
-	global checksum
-	val = struct.unpack('>L',port.read(4));
-	checksum += val[0]
-	checksum += (val[0]>>8)&0xFF
-	checksum += (val[0]>>16)&0xFF
-	checksum += (val[0]>>24)&0xFF
-	return val[0];	
-def readslong():
-	global checksum
-	val = struct.unpack('>l',port.read(4));
-	checksum += val[0]
-	checksum += (val[0]>>8)&0xFF
-	checksum += (val[0]>>16)&0xFF
-	checksum += (val[0]>>24)&0xFF
-	return val[0];	
-
-def writebyte(val):
-	global checksum
-	checksum += val
-	return port.write(struct.pack('>B',val));
-def writesbyte(val):
-	global checksum
-	checksum += val
-	return port.write(struct.pack('>b',val));
-def writeword(val):
-	global checksum
-	checksum += val
-	checksum += (val>>8)&0xFF
-	return port.write(struct.pack('>H',val));
-def writesword(val):
-	global checksum
-	checksum += val
-	checksum += (val>>8)&0xFF
-	return port.write(struct.pack('>h',val));
-def writelong(val):
-	global checksum
-	checksum += val
-	checksum += (val>>8)&0xFF
-	checksum += (val>>16)&0xFF
-	checksum += (val>>24)&0xFF
-	return port.write(struct.pack('>L',val));
-def writeslong(val):
-	global checksum
-	checksum += val
-	checksum += (val>>8)&0xFF
-	checksum += (val>>16)&0xFF
-	checksum += (val>>24)&0xFF
-	return port.write(struct.pack('>l',val));
-
-def M1Forward(val):
-	sendcommand(128,0)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def M1Backward(val):
-	sendcommand(128,1)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMinMainBattery(val):
-	sendcommand(128,2)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMaxMainBattery(val):
-	sendcommand(128,3)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def M2Forward(val):
-	sendcommand(128,4)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def M2Backward(val):
-	sendcommand(128,5)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def DriveM1(val):
-	sendcommand(128,6)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def DriveM2(val):
-	sendcommand(128,7)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def ForwardMixed(val):
-	sendcommand(128,8)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def BackwardMixed(val):
-	sendcommand(128,9)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def RightMixed(val):
-	sendcommand(128,10)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def LeftMixed(val):
-	sendcommand(128,11)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def DriveMixed(val):
-	sendcommand(128,12)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def TurnMixed(val):
-	sendcommand(128,13)
-	writebyte(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def readM1encoder():
-	sendcommand(128,16);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def readM2encoder():
-	sendcommand(128,17);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def readM1speed():
-	sendcommand(128,18);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def readM2speed():
-	sendcommand(128,19);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def ResetEncoderCnts():
-	sendcommand(128,20)
-	writebyte(checksum&0x7F);
-	return;
-
-def readversion():
-	sendcommand(128,21)
-	return port.read(32);
-
-def readmainbattery():
-	sendcommand(128,24);
-	val = readword()
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return val
-	return -1
-
-def readlogicbattery():
-	sendcommand(128,25);
-	val = readword()
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return val
-	return -1
-
-def SetM1pidq(p,i,d,qpps):
-	sendcommand(128,28)
-	writelong(d)
-	writelong(p)
-	writelong(i)
-	writelong(qpps)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2pidq(p,i,d,qpps):
-	sendcommand(128,29)
-	writelong(d)
-	writelong(p)
-	writelong(i)
-	writelong(qpps)
-	writebyte(checksum&0x7F);
-	return;
-
-def readM1instspeed():
-	sendcommand(128,30);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def readM2instspeed():
-	sendcommand(128,31);
-	enc = readslong();
-	status = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (enc,status);
-	return (-1,-1);
-
-def SetM1Duty(val):
-	sendcommand(128,32)
-	writesword(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2Duty(val):
-	sendcommand(128,33)
-	writesword(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedDuty(m1,m2):
-	sendcommand(128,34)
-	writesword(m1)
-	writesword(m2)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM1Speed(val):
-	sendcommand(128,35)
-	writeslong(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2Speed(val):
-	sendcommand(128,36)
-	writeslong(val)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeed(m1,m2):
-	sendcommand(128,37)
-	writeslong(m1)
-	writeslong(m2)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM1SpeedAccel(accel,speed):
-	sendcommand(128,38)
-	writelong(accel)
-	writeslong(speed)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2SpeedAccel(accel,speed):
-	sendcommand(128,39)
-	writelong(accel)
-	writeslong(speed)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeedAccel(accel,speed1,speed2):
-	sendcommand(128,40)
-	writelong(accel)
-	writeslong(speed1)
-	writeslong(speed2)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM1SpeedDistance(speed,distance,buffer):
-	sendcommand(128,41)
-	writeslong(speed)
-	writelong(distance)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2SpeedDistance(speed,distance,buffer):
-	sendcommand(128,42)
-	writeslong(speed)
-	writelong(distance)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeedDistance(speed1,distance1,speed2,distance2,buffer):
-	sendcommand(128,43)
-	writeslong(speed1)
-	writelong(distance1)
-	writeslong(speed2)
-	writelong(distance2)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM1SpeedAccelDistance(accel,speed,distance,buffer):
-	sendcommand(128,44)
-	writelong(accel)
-	writeslong(speed)
-	writelong(distance)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2SpeedAccelDistance(accel,speed,distance,buffer):
-	sendcommand(128,45)
-	writelong(accel)
-	writeslong(speed)
-	writelong(distance)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeedAccelDistance(accel,speed1,distance1,speed2,distance2,buffer):
-	sendcommand(128,46)
-	writelong(accel)
-	writeslong(speed1)
-	writelong(distance1)
-	writeslong(speed2)
-	writelong(distance2)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def readbuffercnts():
-	sendcommand(128,47);
-	buffer1 = readbyte();
-	buffer2 = readbyte();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (buffer1,buffer2);
-	return (-1,-1);
-
-def readcurrents():
-	sendcommand(128,49);
-	motor1 = readword();
-	motor2 = readword();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (motor1,motor2);
-	return (-1,-1);
-
-def SetMixedSpeedIAccel(accel1,speed1,accel2,speed2):
-	sendcommand(128,50)
-	writelong(accel1)
-	writeslong(speed1)
-	writelong(accel2)
-	writeslong(speed2)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeedIAccelDistance(accel1,speed1,distance1,accel2,speed2,distance2,buffer):
-	sendcommand(128,51)
-	writelong(accel1)
-	writeslong(speed1)
-	writelong(distance1)
-	writelong(accel2)
-	writeslong(speed2)
-	writelong(distance2)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM1DutyAccel(accel,duty):
-	sendcommand(128,52)
-	writesword(duty)
-	writeword(accel)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2DutyAccel(accel,duty):
-	sendcommand(128,53)
-	writesword(duty)
-	writeword(accel)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedDutyAccel(accel1,duty1,accel2,duty2):
-	sendcommand(128,54)
-	writesword(duty1)
-	writeword(accel1)
-	writesword(duty2)
-	writeword(accel2)
-	writebyte(checksum&0x7F);
-	return;
-
-def readM1pidq():
-	sendcommand(128,55);
-	p = readlong();
-	i = readlong();
-	d = readlong();
-	qpps = readlong();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (p,i,d,qpps);
-	return (-1,-1,-1,-1)
-
-def readM2pidq():
-	sendcommand(128,56);
-	p = readlong();
-	i = readlong();
-	d = readlong();
-	qpps = readlong();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (p,i,d,qpps);
-	return (-1,-1,-1,-1)
-
-def readmainbatterysettings():
-	sendcommand(128,59);
-	min = readword();
-	max = readword();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (min,max);
-	return (-1,-1);
-
-def readlogicbatterysettings():
-	sendcommand(128,60);
-	min = readword();
-	max = readword();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (min,max);
-	return (-1,-1);
-
-def SetM1PositionConstants(kp,ki,kd,kimax,deadzone,min,max):
-	sendcommand(128,61)
-	writelong(kd)
-	writelong(kp)
-	writelong(ki)
-	writelong(kimax)
-	writelong(min);
-	writelong(max);
-	return;
-
-def SetM2PositionConstants(kp,ki,kd,kimax,deadzone,min,max):
-	sendcommand(128,62)
-	writelong(kd)
-	writelong(kp)
-	writelong(ki)
-	writelong(kimax)
-	writelong(min);
-	writelong(max);
-	return;
-
-def readM1PositionConstants():
-	sendcommand(128,63);
-	p = readlong();
-	i = readlong();
-	d = readlong();
-	imax = readlong();
-	deadzone = readlong();
-	min = readlong();
-	max = readlong();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (p,i,d,imax,deadzone,min,max);
-	return (-1,-1,-1,-1,-1,-1,-1)
-
-def readM2PositionConstants():
-	sendcommand(128,64);
-	p = readlong();
-	i = readlong();
-	d = readlong();
-	imax = readlong();
-	deadzone = readlong();
-	min = readlong();
-	max = readlong();
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return (p,i,d,imax,deadzone,min,max);
-	return (-1,-1,-1,-1,-1,-1,-1)
-
-def SetM1SpeedAccelDeccelPosition(accel,speed,deccel,position,buffer):
-	sendcommand(128,65)
-	writelong(accel)
-	writelong(speed)
-	writelong(deccel)
-	writelong(position)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetM2SpeedAccelDeccelPosition(accel,speed,deccel,position,buffer):
-	sendcommand(128,66)
-	writelong(accel)
-	writelong(speed)
-	writelong(deccel)
-	writelong(position)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def SetMixedSpeedAccelDeccelPosition(accel1,speed1,deccel1,position1,accel2,speed2,deccel2,position2,buffer):
-	sendcommand(128,67)
-	writelong(accel1)
-	writelong(speed1)
-	writelong(deccel1)
-	writelong(position1)
-	writelong(accel2)
-	writelong(speed2)
-	writelong(deccel2)
-	writelong(position2)
-	writebyte(buffer)
-	writebyte(checksum&0x7F);
-	return;
-
-def readtemperature():
-	sendcommand(128,82);
-	val = readword()
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return val
-	return -1
-
-def readerrorstate():
-	sendcommand(128,90);
-	val = readbyte()
-	crc = checksum&0x7F
-	if crc==readbyte():
-		return val
-	return -1
-
-
-print "Roboclaw Example 1\r\n"
-
-#Rasberry Pi/Linux Serial instance example
-#port = serial.Serial("/dev/ttyACM0", baudrate=115200, timeout=0.1)
-
-#Windows Serial instance example
-port = serial.Serial("COM253", baudrate=38400, timeout=1)
-
-#Get version string
-sendcommand(128,21);
-rcv = port.read(32)
-print repr(rcv)
-
-cnt = 0
-while True:
-	cnt=cnt+1
-	print "Count = ",cnt
-	
-	print "Error State:",repr(readerrorstate())
-
-	print "Temperature:",readtemperature()/10.0
-
-	print "Main Battery:",readmainbattery()/10.0
-	
-	print "Logic Battery:",readlogicbattery()/10.0
-
-	m1cur, m2cur = readcurrents();
-	print "Current M1: ",m1cur/10.0," M2: ",m2cur/10.0
-	
-	min, max = readlogicbatterysettings()
-	print "Logic Battery Min:",min/10.0," Max:",max/10.0
-
-	min, max = readmainbatterysettings()
-	print "Main Battery Min:",min/10.0," Max:",max/10.0
-
-	p,i,d,qpps = readM1pidq()
-	print "M1 P=%.2f" % (p/65536.0)
-	print "M1 I=%.2f" % (i/65536.0)
-	print "M1 D=%.2f" % (d/65536.0)
-	print "M1 QPPS=",qpps
-
-	p,i,d,qpps = readM2pidq()
-	print "M2 P=%.2f" % (p/65536.0)
-	print "M2 I=%.2f" % (i/65536.0)
-	print "M2 D=%.2f" % (d/65536.0)
-	print "M2 QPPS=",qpps
-
-	SetM1DutyAccel(1500,1500)
-	SetM2DutyAccel(1500,-1500)
-	time.sleep(2)
-	SetM1DutyAccel(1500,-1500)
-	SetM2DutyAccel(1500,1500)
-	time.sleep(2)
-
-
+import serial
+
+
+class Roboclaw:
+
+    def __init__(self, address, port):
+        self.address = address
+        self.checksum = 0
+        self.port = serial.Serial(port, baudrate=38400, timeout=1)
+
+    def send_command(self, address, command):
+        self.checksum = address
+        self.port.write(chr(address))
+        self.checksum += command
+        self.port.write(chr(command))
+        return
+
+    def read_byte(self):
+        val = struct.unpack('>B', self.port.read(1))
+        self.checksum += val[0]
+        return val[0]
+    
+    def read_s_byte(self):
+        val = struct.unpack('>b', self.port.read(1))
+        self.checksum += val[0]
+        return val[0]
+    
+    def read_word(self):
+        val = struct.unpack('>H', self.port.read(2))
+        self.checksum += (val[0] & 0xFF)
+        self.checksum += (val[0] >> 8) & 0xFF
+        return val[0]
+    
+    def read_s_word(self):
+        val = struct.unpack('>h', self.port.read(2))
+        self.checksum += val[0]
+        self.checksum += (val[0] >> 8) & 0xFF
+        return val[0]
+    
+    def read_long(self):
+        val = struct.unpack('>L', self.port.read(4))
+        self.checksum += val[0]
+        self.checksum += (val[0] >> 8) & 0xFF
+        self.checksum += (val[0] >> 16) & 0xFF
+        self.checksum += (val[0] >> 24) & 0xFF
+        return val[0]
+
+    def read_s_long(self):
+        val = struct.unpack('>l', self.port.read(4))
+        self.checksum += val[0]
+        self.checksum += (val[0] >> 8) & 0xFF
+        self.checksum += (val[0] >> 16) & 0xFF
+        self.checksum += (val[0] >> 24) & 0xFF
+        return val[0]
+
+    def write_byte(self, val):
+        self.checksum += val
+        return self.port.write(struct.pack('>B', val))
+    
+    def write_s_byte(self, val):
+        self.checksum += val
+        return self.port.write(struct.pack('>b', val))
+    
+    def write_word(self, val):
+        self.checksum += val
+        self.checksum += (val >> 8) & 0xFF
+        return self.port.write(struct.pack('>H', val))
+    
+    def write_s_word(self, val):
+        self.checksum += val
+        self.checksum += (val >> 8) & 0xFF
+        return self.port.write(struct.pack('>h', val))
+    
+    def write_long(self, val):
+        self.checksum += val
+        self.checksum += (val >> 8) & 0xFF
+        self.checksum += (val >> 16) & 0xFF
+        self.checksum += (val >> 24) & 0xFF
+        return self.port.write(struct.pack('>L', val))
+    
+    def write_s_long(self, val):
+        self.checksum += val
+        self.checksum += (val >> 8) & 0xFF
+        self.checksum += (val >> 16) & 0xFF
+        self.checksum += (val >> 24) & 0xFF
+        return self.port.write(struct.pack('>l', val))
+
+    def m1_forward(self, val):
+        self.send_command(128, 0)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def m1_backward(self, val):
+        self.send_command(128, 1)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_min_main_battery(self, val):
+        self.send_command(128, 2)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_max_main_battery(self, val):
+        self.send_command(128, 3)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def m2_forward(self, val):
+        self.send_command(128, 4)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def m2_backward(self, val):
+        self.send_command(128, 5)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def drive_m1(self, val):
+        self.send_command(128, 6)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def drive_m2(self, val):
+        self.send_command(128, 7)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def forward_mixed(self, val):
+        self.send_command(128, 8)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def backward_mixed(self, val):
+        self.send_command(128, 9)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def right_mixed(self, val):
+        self.send_command(128, 10)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def left_mixed(self, val):
+        self.send_command(128, 11)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def drive_mixed(self, val):
+        self.send_command(128, 12)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def turn_mixed(self, val):
+        self.send_command(128,  13)
+        self.write_byte(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_m1_encoder(self):
+        self.send_command(128,  16)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def read_m2_encoder(self):
+        self.send_command(128, 17)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def read_m1_speed(self):
+        self.send_command(128,  18)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def read_m2_speed(self):
+        self.send_command(128, 19)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def reset_encoder_cnts(self):
+        self.send_command(128,  20)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_version(self):
+        self.send_command(128, 21)
+        return self.port.read(32)
+
+    def read_main_battery(self):
+        self.send_command(128, 24)
+        val = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return val
+        return -1
+
+    def read_logic_battery(self):
+        self.send_command(128, 25)
+        val = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return val
+        return -1
+
+    def set_m1_pidq(self, p, i, d, qpps):
+        self.send_command(128,  28)
+        self.write_long(d)
+        self.write_long(p)
+        self.write_long(i)
+        self.write_long(qpps)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_pidq(self, p, i, d, qpps):
+        self.send_command(128, 29)
+        self.write_long(d)
+        self.write_long(p)
+        self.write_long(i)
+        self.write_long(qpps)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_m1_inst_speed(self):
+        self.send_command(128, 30)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def read_m2_inst_speed(self):
+        self.send_command(128, 31)
+        enc = self.read_s_long()
+        status = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return enc, status
+        return -1, -1
+
+    def set_m1_duty(self, val):
+        self.send_command(128, 32)
+        self.write_s_word(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_duty(self, val):
+        self.send_command(128, 33)
+        self.write_s_word(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_duty(self, m1, m2):
+        self.send_command(128, 34)
+        self.write_s_word(m1)
+        self.write_s_word(m2)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m1_speed(self, val):
+        self.send_command(128, 35)
+        self.write_s_long(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_speed(self, val):
+        self.send_command(128,  36)
+        self.write_s_long(val)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed(self, m1, m2):
+        self.send_command(128,  37)
+        self.write_s_long(m1)
+        self.write_s_long(m2)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m1_speed_accel(self, accel, speed):
+        self.send_command(128,  38)
+        self.write_long(accel)
+        self.write_s_long(speed)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_speed_accel(self, accel, speed):
+        self.send_command(128, 39)
+        self.write_long(accel)
+        self.write_s_long(speed)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed_accel(self, accel, speed1, speed2):
+        self.send_command(128,  40)
+        self.write_long(accel)
+        self.write_s_long(speed1)
+        self.write_s_long(speed2)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m1_speed_distance(self, speed, distance, buffer):
+        self.send_command(128, 41)
+        self.write_s_long(speed)
+        self.write_long(distance)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_speed_distance(self, speed, distance, buffer):
+        self.send_command(128, 42)
+        self.write_s_long(speed)
+        self.write_long(distance)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed_distance(self, speed1, distance1, speed2, distance2, buffer):
+        self.send_command(128, 43)
+        self.write_s_long(speed1)
+        self.write_long(distance1)
+        self.write_s_long(speed2)
+        self.write_long(distance2)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m1_speed_accel_distance(self, accel, speed, distance, buffer):
+        self.send_command(128, 44)
+        self.write_long(accel)
+        self.write_s_long(speed)
+        self.write_long(distance)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_speed_accel_distance(self, accel, speed, distance, buffer):
+        self.send_command(128, 45)
+        self.write_long(accel)
+        self.write_s_long(speed)
+        self.write_long(distance)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed_accel_distance(self, accel, speed1, distance1, speed2, distance2, buffer):
+        self.send_command(128, 46)
+        self.write_long(accel)
+        self.write_s_long(speed1)
+        self.write_long(distance1)
+        self.write_s_long(speed2)
+        self.write_long(distance2)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_buffer_cnts(self):
+        self.send_command(128, 47)
+        buffer1 = self.read_byte()
+        buffer2 = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return buffer1, buffer2
+        return -1, -1
+
+    def read_currents(self):
+        self.send_command(128, 49)
+        motor1 = self.read_word()
+        motor2 = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return motor1, motor2
+        return -1, -1
+
+    def set_mixed_speed_i_accel(self, accel1, speed1, accel2, speed2):
+        self.send_command(128, 50)
+        self.write_long(accel1)
+        self.write_s_long(speed1)
+        self.write_long(accel2)
+        self.write_s_long(speed2)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed_i_accel_distance(self, accel1, speed1, distance1, accel2, speed2, distance2, buffer):
+        self.send_command(128, 51)
+        self.write_long(accel1)
+        self.write_s_long(speed1)
+        self.write_long(distance1)
+        self.write_long(accel2)
+        self.write_s_long(speed2)
+        self.write_long(distance2)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m1_duty_accel(self, accel, duty):
+        self.send_command(128, 52)
+        self.write_s_word(duty)
+        self.write_word(accel)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_duty_accel(self, accel, duty):
+        self.send_command(128, 53)
+        self.write_s_word(duty)
+        self.write_word(accel)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_duty_accel(self, accel1, duty1, accel2, duty2):
+        self.send_command(128, 54)
+        self.write_s_word(duty1)
+        self.write_word(accel1)
+        self.write_s_word(duty2)
+        self.write_word(accel2)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_m1_pidq(self):
+        self.send_command(128, 55)
+        p = self.read_long()
+        i = self.read_long()
+        d = self.read_long()
+        qpps = self.read_long()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return p, i, d, qpps
+        return -1, -1, -1, -1
+
+    def read_m2_pidq(self):
+        self.send_command(128, 56)
+        p = self.read_long()
+        i = self.read_long()
+        d = self.read_long()
+        qpps = self.read_long()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return p, i, d, qpps
+        return -1, -1, -1, -1
+
+    def read_main_battery_settings(self):
+        self.send_command(128, 59)
+        min = self.read_word()
+        max = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return min, max
+        return -1, -1
+
+    def read_logic_battery_settings(self):
+        self.send_command(128, 60)
+        min = self.read_word()
+        max = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return min, max
+        return -1, -1
+
+    def set_m1_position_constants(self, kp, ki, kd, kimax, deadzone, min, max):
+        self.send_command(128, 61)
+        self.write_long(kd)
+        self.write_long(kp)
+        self.write_long(ki)
+        self.write_long(kimax)
+        self.write_long(min)
+        self.write_long(max)
+        return
+
+    def set_m2_position_constants(self, kp, ki, kd, kimax, deadzone, min, max):
+        self.send_command(128, 62)
+        self.write_long(kd)
+        self.write_long(kp)
+        self.write_long(ki)
+        self.write_long(kimax)
+        self.write_long(min)
+        self.write_long(max)
+        return
+
+    def read_m1_position_constants(self):
+        self.send_command(128, 63)
+        p = self.read_long()
+        i = self.read_long()
+        d = self.read_long()
+        imax = self.read_long()
+        deadzone = self.read_long()
+        min = self.read_long()
+        max = self.read_long()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return p, i, d, imax, deadzone, min, max
+        return -1, -1, -1, -1, -1, -1, -1
+
+    def read_m2_position_constants(self):
+        self.send_command(128, 64)
+        p = self.read_long()
+        i = self.read_long()
+        d = self.read_long()
+        imax = self.read_long()
+        deadzone = self.read_long()
+        min = self.read_long()
+        max = self.read_long()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return p, i, d, imax, deadzone, min, max
+        return -1, -1, -1, -1, -1, -1, -1
+
+    def set_m1_speed_accel_deccel_position(self, accel, speed, deccel, position, buffer):
+        self.send_command(128, 65)
+        self.write_long(accel)
+        self.write_long(speed)
+        self.write_long(deccel)
+        self.write_long(position)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_m2_speed_accel_deccel_position(self, accel, speed, deccel, position, buffer):
+        self.send_command(128, 66)
+        self.write_long(accel)
+        self.write_long(speed)
+        self.write_long(deccel)
+        self.write_long(position)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def set_mixed_speed_accel_deccel_position(self, accel1, speed1, deccel1, position1, accel2, speed2, deccel2, position2, buffer):
+        self.send_command(128, 67)
+        self.write_long(accel1)
+        self.write_long(speed1)
+        self.write_long(deccel1)
+        self.write_long(position1)
+        self.write_long(accel2)
+        self.write_long(speed2)
+        self.write_long(deccel2)
+        self.write_long(position2)
+        self.write_byte(buffer)
+        self.write_byte(self.checksum & 0x7F)
+        return
+
+    def read_temperature(self):
+        self.send_command(128, 82)
+        val = self.read_word()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return val
+        return -1
+
+    def read_error_state(self):
+        self.send_command(128, 90)
+        val = self.read_byte()
+        crc = self.checksum & 0x7F
+        if crc == self.read_byte():
+            return val
+        return -1
