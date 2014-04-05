@@ -53,9 +53,16 @@ while True:
     print "M2 D=%.2f" % (d/65536.0)
     print "M2 QPPS=", qpps
 
-    robo.set_m1_duty_accel(1500, 1500)
-    robo.set_m2_duty_accel(1500, -1500)
-    time.sleep(2)
-    robo.set_m1_duty_accel(1500, -1500)
-    robo.set_m2_duty_accel(1500, 1500)
-    time.sleep(2)
+    robo.m1_forward(127)
+    for i in range(5):
+        m1cur, m2cur = robo.read_currents()
+        print "Current M1: ", m1cur/100.0, "A M2: ", m2cur/100.0, "A"
+        time.sleep(1)
+    robo.m1_forward(0)
+    time.sleep(5)
+
+    #robo.set_m2_duty_accel(1500, -1500)
+    #time.sleep(2)
+    #robo.set_m1_duty_accel(1500, -1500)
+    #robo.set_m2_duty_accel(1500, 1500)
+    #time.sleep(2)
