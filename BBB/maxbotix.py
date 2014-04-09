@@ -6,7 +6,8 @@ from time import sleep
 i2c = Adafruit_I2C(0x70)  # Default Sensor address. Can be changed with other I2C commands
 
 while True:
-    i2c.write8(0, 0x51)  # Take Range Reading
+    #i2c.write8(0, 0x51)  # Take Range Reading
+    i2c.write8_noreg(0x51)
 
     # Not sure what the correct sleep value should be.
     # With the timing analyzer I was seeing that the status pin was high for around 15ms.
