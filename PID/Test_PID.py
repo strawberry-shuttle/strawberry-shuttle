@@ -34,7 +34,7 @@ claw.m2_forward(curM2)
 
 while(1):
 	#read ultrasonic values
-	#encAngle = encProt.getAngle
+	#encAngle = encProt.getAngle()
 	#measurement = [encAngle, ultrasonic] or using numpy
 	#kalman.correct(measurement)
 	#filteredAngle = kalman.state_post
