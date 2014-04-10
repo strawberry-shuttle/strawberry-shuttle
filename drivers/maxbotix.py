@@ -1,4 +1,4 @@
-from Adafruit_I2C import Adafruit_I2C
+from drivers.BBB_lib.Adafruit_I2C import Adafruit_I2C
 import Adafruit_BBIO.GPIO as GPIO
 from time import sleep
 
