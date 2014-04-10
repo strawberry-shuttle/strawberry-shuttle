@@ -1,8 +1,9 @@
 import time
-from roboclaw import Roboclaw
+
+from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
 
- 
+
 UART.setup("UART1")
 
 
