@@ -30,7 +30,7 @@ class Control:
         self.frontBumper = False
         self.backBumper = False
 
-        self.PID = PIDControl(0, 0, 100) #update these values
+        self.PID = PIDControl(0, [1,0,0], 100) #update these values
 
     def changeState(self, newState):
         if newState == State.canceled:
