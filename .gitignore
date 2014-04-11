@@ -1,2 +1,5 @@
 natcar-prototype/Debug/
+.out
 .idea
+*.pyc
+*.pyo
