@@ -1,25 +1,26 @@
+__author__ = 'Vijay Ganesan'
+# Maxbotix MB-1202 Ultrasonic Sensor API for BBB
+# Maxbotix Sensor Documentation: http://maxbotix.com/documents/I2CXL-MaxSonar-EZ_Datasheet.pdf
+# See maxbotix_test.py for implementation example
+
 from drivers.BBB_lib.Adafruit_I2C import Adafruit_I2C
-import Adafruit_BBIO.GPIO as GPIO
 from time import sleep
 
-# Maxbotix Sensor Documentation: http://maxbotix.com/documents/I2CXL-MaxSonar-EZ_Datasheet.pdf
+class Ultrasonic_MB:
+    """Maxbotix MB1202 I2C Ultrasonic Sensor Class"""
+    def __init__(self,debug=0): #Initialize using default sensor address
+        self.addr = 0x70
+        self.i2c = Adafruit_I2C(0x70,-1,debug)
 
-i2c = Adafruit_I2C(0x70)  # Default Sensor address. Can be changed with other I2C commands
-GPIO.setup("P8_14",GPIO.IN)
+    def __init__(self,addr,debug=0): #Initialize using given I2C address
+        self.addr = addr
+        self.i2c = Adafruit_I2C(addr,-1,debug)
 
-while True:
-    i2c.write8_noreg(0x51)
+    def setAddr(self): #Modify the sensor address, WARNING: Use very sparingly, addresses are saved over power cycles
+        return self.i2c.writeList(self.addr,0,[0xAA,0xA5,addr])
+
+    def ping(self): #Send signal, -1 if failed
+        return self.i2c.write8_noreg(0x51)
     
-    if GPIO.input("P8_14"):
-        print("HIGH")
-    else:
-        print("LOW")
-
-    sleep(0.1) #We really only need to wait 50 us to check
-
-    if GPIO.input("P8_14"):
-        print("HIGH")
-    else:
-        print("LOW")
-
-    print i2c.reverseByteOrder(i2c.readU16(0x0))  # Read latest range reading
+    def read(self): #Read result, -1 if failed
+        return self.i2c.reverseByteOrder(i2c.readU16(0x0))
