@@ -6,4 +6,4 @@ UART.setup("UART1")
 
 robo = Roboclaw(0x80, "/dev/ttyO1")
 
-# Usage: from roboclaw_repl import robo
+# Usage: from drivers.roboclaw_repl import robo
