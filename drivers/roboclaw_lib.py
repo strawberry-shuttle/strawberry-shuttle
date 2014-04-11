@@ -504,7 +504,7 @@ class Roboclaw:
             return min, max
         return -1, -1
 
-    def set_m1_position_constants(self, kp, ki, kd, kimax, deadzone, min, max):
+    def set_m1_position_constants(self, kp, ki, kd, kimax, min, max):
         self.__send_command(61)
         self.__write_long(kd)
         self.__write_long(kp)
@@ -515,7 +515,7 @@ class Roboclaw:
         self.__write_checksum()
         return
 
-    def set_m2_position_constants(self, kp, ki, kd, kimax, deadzone, min, max):
+    def set_m2_position_constants(self, kp, ki, kd, kimax, min, max):
         self.__send_command(62)
         self.__write_long(kd)
         self.__write_long(kp)
