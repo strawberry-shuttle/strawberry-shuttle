@@ -1,32 +1,28 @@
 #Evan Racah
 #class that keeps track of angle of robot
 #from encoders
-from BBB.roboclaw import Roboclaw
+from __future__ import division
 
-class EncoderProtractor(object):
-	def __init__(self, initialAngle, wheelCircumfrence, robotDiameter, encoderResolution): #these should be doubles
-		self.angle = initialAngle
-		self.shuttleDiam = robotDiameter
-		self.wheelCircum = wheelCircumfrence
-		self.encResolution = encoderResolution #how many encoder counts in 1 rev
-		self.enc1Prev = 0
-		self.enc2Prev = 0
-		self.robo = Roboclaw(0x80, "/dev/ttyO1")
 
-	def getEncoderCounts(): #sets enc1 and enc2 does not return them
-		if (test1 = self.robo.read_m1_encoder())[0] != -1: #make sure successfully reads encoders
-			self.enc1 = test1[0]
-		if (test2 = self.robo.read_m2_encoder())[0] != -1:
-			self.enc2 = test2[0]
-		#if encoder reading unsuccessful enc1 and enc2 will remain their previous values
+class EncoderProtractor:
+    def __init__(self, initialAngle, wheelCircumference, robotDiameter):
+        self.angle = initialAngle
+        self.robotDiameter = robotDiameter
+        self.wheelCircum = wheelCircumference
+        self.encLeftPrev = 0
+        self.encRightPrev = 0
+        self.encLeftDiff = 0
+        self.encRightDiff = 0
 
-	def getAngle(self):
-		self.enc1Diff = self.enc1 - self.enc1Prev
-		self.enc2Diff = self.enc2 - self.enc2Prev
-		d1 = self.enc1Diff * self.wheelCircum / self.encResolution
-		d2 = self.enc2Diff * self.weelCircum / self.encResolution
-		self.angle = ((d1 - d2) / self.shuttleDiam) + self.angle
-		self.enc1Prev = self.enc1
-		self.enc2Prev = self.enc2
-		return self.angle
+    def getAngle(self, enc):
+        encLeft = enc[0]
+        encRight = enc[1]
 
+        self.encLeftDiff = encLeft - self.encLeftPrev
+        self.encRightDiff = encRight - self.encRightPrev
+        d1 = self.encLeftDiff * self.wheelCircum
+        d2 = self.encRightDiff * self.wheelCircum
+        self.angle = ((d1 - d2) / self.robotDiameter) + self.angle
+        self.encLeftPrev = encLeft
+        self.encRightPrev = encRight
+        return self.angle

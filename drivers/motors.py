@@ -1,3 +1,4 @@
+from __future__ import division
 __author__ = 'Scotty Waggoner'
 
 from drivers.roboclaw_lib import Roboclaw
@@ -35,6 +36,20 @@ class Motors:
         right = -abs(right)
         self.front_motors.set_mixed_duty_accel(1000, left, 1000, right)
         #self.back_motors.set_mixed_duty_accel(1000, left, 1000, right)
+
+    def readEncoders(self):
+        #Average
+        left = self.front_motors.read_m1_speed()[0]
+        #left += self.back_motors.read_m1_speed()[0]
+        #left /= 2
+        right = self.front_motors.read_m2_speed()[0]
+        #right += self.back_motors.read_m2_speed()[0]
+        #right /= 2
+
+        #Convert pulses per second to revolutions per second
+        left /= 1024
+        right /= 1024
+        return left, right  # Returns values in revolutions per second
 
     def print_currents(self):
         m1cur, m2cur = self.front_motors.read_currents()

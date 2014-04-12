@@ -2,6 +2,7 @@ __author__ = 'Scotty Waggoner'
 import time
 from enum import Enum
 from drivers.motors import Motors
+from PID.encoderAngle import EncoderProtractor
 from PID.PID import PIDControl
 
 
@@ -30,7 +31,8 @@ class Control:
         self.frontBumper = False
         self.backBumper = False
 
-        self.PID = PIDControl(0, [1,0,0], 100) #update these values
+        self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
+        self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
 
     def changeState(self, newState):
         if newState == State.canceled:
@@ -77,7 +79,12 @@ class Control:
             #or end of furrow detected: then change state to canceled
 
             if self.currentState > State.canceled:  # Robot not stopped
-                #Request most recent values from camera, side ultrasonic, and encoders
+                #Request most recent values from side ultrasonic
+
+                #Request most recent values from camera
+
+                #Request most recent values from encoders
+                encoderAngle = self.encoderProtractor.getAngle(self.motors.readEncoders())
 
                 #Call angle calculation for ultrasonic and encoders
 
