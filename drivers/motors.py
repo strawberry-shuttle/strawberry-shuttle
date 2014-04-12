@@ -71,8 +71,8 @@ class Motors:
         #right /= 2
 
         #Convert pulses per second to revolutions per second
-        left /= 1024
-        right /= 1024
+        left = self.pulsesToRev(left)
+        right = self.pulsesToRev(right)
         return left, right  # Returns values in revolutions per second
 
     def print_currents(self):
