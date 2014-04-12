@@ -6,7 +6,7 @@ import smbus
 # Adafruit_I2C Class
 # ===========================================================================
 
-class Adafruit_I2C :
+class Adafruit_I2C:
 
     def __init__(self, address, busnum=-1, debug=False):
         self.address = address
