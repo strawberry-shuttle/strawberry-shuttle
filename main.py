@@ -86,7 +86,7 @@ class Control:
                 #Request most recent values from encoders
                 encoderAngle = self.encoderProtractor.getAngle(self.motors.readEncoders())
 
-                #Call angle calculation for ultrasonic and encoders
+                #Call angle calculation for ultrasonic
 
                 #Call Kalman filter with most recent values
 
@@ -95,9 +95,9 @@ class Control:
 
                 #Update motor speeds
                 if self.currentState == State.moveForward:
-                    self.motors.moveForward(1000, 1000)
+                    self.motors.moveForward(4, 4)
                 elif self.currentState == State.moveBackward:
-                    self.motors.moveBackward(1000, 1000)
+                    self.motors.moveBackward(4, 4)
 
 
 robot = Control()

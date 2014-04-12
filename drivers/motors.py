@@ -15,27 +15,51 @@ class Motors:
         self.front_motors = Roboclaw(0x80, "/dev/ttyO1")
         self.back_motors = Roboclaw(0x81, "/dev/ttyO1")
 
-    def stop(self):
-        self.front_motors.set_mixed_duty_accel(500, 0, 500, 0)
-        #self.back_motors.set_mixed_duty_accel(500, 0, 500, 0)
+        self.encoderResolution = 1024
+        self.maxSpeed = 4400  # Units of pulses per second. 100% of power is given at this encoder reading (~4.3 rev/sec)
+        self.acceleration = 2200  # pulses per second per second
 
-    def estop(self):
-        self.front_motors.set_mixed_duty_accel(65535, 0, 500, 0)
-        #self.back_motors.set_mixed_duty_accel(65535, 0, 500, 0)
+        self.p = int(1.0 * 65536)
+        self.i = int(0.5 * 65536)
+        self.d = int(0.25 * 65536)
+        self.front_motors.set_m1_pidq(self.p, self.i, self.d, self.maxSpeed)
+        self.front_motors.set_m2_pidq(self.p, self.i, self.d, self.maxSpeed)
+        #self.back_motors.set_m1_pidq(self.p, self.i, self.d, self.maxSpeed)
+        #self.back_motors.set_m2_pidq(self.p, self.i, self.d, self.maxSpeed)
+
+    def revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
+        return int(revolutions * self.encoderResolution)
+
+    def pulsesToRev(self, pulses):  # Convert pulses per second to revolutions per second
+        return pulses / self.encoderResolution
+
+    def stop(self):  # Stop with deceleration
+        self.front_motors.set_m1_speed_accel(self.acceleration, 0)
+        self.front_motors.set_m2_speed_accel(self.acceleration, 0)
+        #self.back_motors.set_m1_speed_accel(self.acceleration, 0)
+        #self.back_motors.set_m2_speed_accel(self.acceleration, 0)
+
+    def estop(self):  # Stop instantly
+        self.front_motors.m1_forward(0)
+        self.front_motors.m2_forward(0)
+        #self.back_motors.m1_forward(0)
+        #self.back_motors.m2_forward(0)
 
     def moveForward(self, left, right):
-        #speed is 0-1500
-        left = abs(left)
-        right = abs(right)
-        self.front_motors.set_mixed_duty_accel(1000, left, 1000, right)
-        #self.back_motors.set_mixed_duty_accel(1000, left, 1000, right)
+        left = self.revToPulses(abs(left))
+        right = self.revToPulses(abs(right))
+        self.front_motors.set_m1_speed_accel(self.acceleration, left)
+        self.front_motors.set_m2_speed_accel(self.acceleration, right)
+        #self.back_motors.set_m1_speed_accel(self.acceleration, left)
+        #self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def moveBackward(self, left, right):
-        #speed is 0-1500
-        left = -abs(left)
-        right = -abs(right)
-        self.front_motors.set_mixed_duty_accel(1000, left, 1000, right)
-        #self.back_motors.set_mixed_duty_accel(1000, left, 1000, right)
+        left = self.revToPulses(-abs(left))
+        right = self.revToPulses(-abs(right))
+        self.front_motors.set_m1_speed_accel(self.acceleration, left)
+        self.front_motors.set_m2_speed_accel(self.acceleration, right)
+        #self.back_motors.set_m1_speed_accel(self.acceleration, left)
+        #self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def readEncoders(self):
         #Average
