@@ -4,8 +4,9 @@ __author__ = 'Scotty Waggoner'
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
 
-# Motor control is currently implemented with Duty Cycle and Acceleration. This needs to be changed to use
-# set_mixed_speed_i_accel once encoders are implemented
+# Standalone usage in Python REPL:
+# from drivers.motors import Motors
+# motors = Motors()
 
 class Motors:
 
