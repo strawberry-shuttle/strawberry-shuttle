@@ -2,8 +2,7 @@
 #class that keeps track of angle of robot
 #from encoders
 from __future__ import division
-
-
+import time
 class EncoderProtractor:
     def __init__(self, initialAngle, wheelCircumference, robotDiameter):
         self.angle = initialAngle
@@ -26,3 +25,12 @@ class EncoderProtractor:
         self.encLeftPrev = encLeft
         self.encRightPrev = encRight
         return self.angle
+
+if __name__== "__main__":
+	encAngle = EncoderProtractor(0, 12.5, 10);
+	encc = [10, 10]
+	while(1):
+		print encAngle.getAngle(encc)
+		encc[0]+= 5
+		encc[1]+= 10
+		time.sleep(1)
