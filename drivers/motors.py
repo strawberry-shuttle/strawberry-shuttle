@@ -76,8 +76,12 @@ class Motors:
         right = self.pulsesToRev(right)
         return left, right  # Returns values in revolutions per second
 
-    def print_currents(self):
+    def printCurrents(self):
         m1cur, m2cur = self.front_motors.read_currents()
-        print "Current M1: ", m1cur/10.0, " M2: ", m2cur/10.0
+        print "Current Left: ", m1cur/100.0, "A Right: ", m2cur/100.0, "A"
         #m1cur, m2cur = self.back_motors.read_currents()
-        #print "Current M1: ", m1cur/10.0, " M2: ", m2cur/10.0
+        #print "Current M1: ", m1cur/100.0, "A M2: ", m2cur/100.0, "A"
+
+    def printEncoders(self):
+        left, right = self.readEncoders()
+        print "Speed Left: ", left, " rev/sec Right: ", right/100.0, " rev/sec"
