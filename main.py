@@ -55,20 +55,8 @@ class Control:
             #self.motors.moveBackward()
         self.currentState = newState
 
-    def run(self):
-        while True:
-            if self.currentState == State.moveForward:
-                #Request reading from front ultrasonic
-                #Request reading from the 2 side front ultrasonics
-                pass
-            elif self.currentState == State.moveBackward:
-                #Request reading from back ultrasonic
-                #Request reading from the 2 side back ultrasonics
-                pass
-
-            #Update btn and bumper states
-
-            #Update state
+    def updateState():
+        #Update state
             if self.redBtn or (self.currentState == State.moveForward and self.frontBumper) or (self.currentState == State.moveBackward and self.backBumper):
                 self.changeState(State.estop)
             elif self.frontYellowBtn or self.backGreenBtn:
@@ -78,7 +66,15 @@ class Control:
             #or front/back ultrasonic detects close object: then slow down and eventually stop
             #or end of furrow detected: then change state to cancelled
 
-            if self.currentState > State.cancelled:  # Robot not stopped
+    def moveInFurrow():
+         if self.currentState == State.moveForward:
+                #Request reading from front ultrasonic
+                #Request reading from the 2 side front ultrasonics
+                pass
+        elif self.currentState == State.moveBackward:
+                #Request reading from back ultrasonic
+                #Request reading from the 2 side back ultrasonics
+                pass
                 #Request most recent values from side ultrasonic
 
                 #Request most recent values from camera
@@ -94,10 +90,19 @@ class Control:
                 angle = self.PID.update(0)
 
                 #Update motor speeds
-                if self.currentState == State.moveForward:
-                    self.motors.moveForward(4, 4)
-                elif self.currentState == State.moveBackward:
-                    self.motors.moveBackward(4, 4)
+            if self.currentState == State.moveForward:
+                self.motors.moveForward(4, 4)
+            elif self.currentState == State.moveBackward:
+                self.motors.moveBackward(4, 4)
+
+    def run(self):
+        while True:
+            #Update btn and bumper states
+            self.updateState()
+            
+
+            if self.currentState > State.cancelled:  # Robot not stopped
+               self.moveInFurrow()
 
 
 robot = Control()
