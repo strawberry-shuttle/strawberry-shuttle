@@ -4,7 +4,7 @@ from enum import Enum
 from drivers.motors import Motors
 from PID.encoderAngle import EncoderProtractor
 from PID.PID import PIDControl
-
+#from cv2 import KalmanFilter
 
 class State(Enum):
     estop = 1
@@ -91,7 +91,7 @@ class Control:
                 #Call Kalman filter with most recent values
 
                 #Run PID with those values
-                self.PID.update(0)
+                angle= self.PID.update(0)
 
                 #Update motor speeds
                 if self.currentState == State.moveForward:

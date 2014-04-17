@@ -21,26 +21,28 @@ class PIDControl(object):
     def update(self, measurement):
         self.now = time.time()
         self.timeInterval = self.now - self.lastTime
-        self.calcErrorTerms(measurement)
-        self.input = self.calcInput()
+        self._calcErrorTerms(measurement)
+        self.input = self._calcInput()
         self.lastTime = self.now
         self.previousError = self.error
-        return self.convertTo8Bit(self.input)
+        return self._convertTo8Bit(self.input)
 
-    def convertTo8Bit(self, speedDiff):
+    def set_set_point(self, setpoint):
+        self.setpoint = setpoint
+
+    def _convertTo8Bit(self, speedDiff):
         return (speedDiff / self.maxDiff) * 127
 
 
-    def calcErrorTerms(self, measurement):
+    def _calcErrorTerms(self, measurement):
         self.error = max(min(self.setpoint - measurement, self.max_error), self.min_error)
         self.errorTotal += self.error * self.timeInterval
         self.dError = (self.error - self.previousError) / self.timeInterval
 
-    def calcInput(self):
+    def _calcInput(self):
         self.P = self.kP * self.error
         self.I = self.kI * self.errorTotal * self.timeInterval
         self.D = self.kD * (self.dError / self.timeInterval)
         return self.P + self.I + self.D
 
-    def set_set_point(self, setpoint):
-        self.setpoint = setpoint
+ 
