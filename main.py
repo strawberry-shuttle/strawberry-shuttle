@@ -4,14 +4,14 @@ from enum import Enum
 from drivers.motors import Motors
 from PID.encoderAngle import EncoderProtractor
 from PID.PID import PIDControl
-#from cv2 import KalmanFilter
+#from kalman.kalman import Kalman
 
 class State(Enum):
     estop = 1
-    canceled = 2
+    cancelled = 2
     moveForward = 3
     moveBackward = 4
-    #not sure if we need new states for move away 10ft or if we can just set a timer to move to the canceled state or set a flag to check encoder counts
+    #not sure if we need new states for move away 10ft or if we can just set a timer to move to the cancelled state or set a flag to check encoder counts
     #moveForwardDistance = 5
     #moveBackwardDistance = 6
 
@@ -20,7 +20,7 @@ class Control:
 
     def __init__(self):
         self.motors = Motors()
-        self.currentState = State.canceled
+        self.currentState = State.cancelled
 
         # init to false until buttons and bumpers are implemented
         self.redBtn = False
@@ -35,14 +35,14 @@ class Control:
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
 
     def changeState(self, newState):
-        if newState == State.canceled:
+        if newState == State.cancelled:
             #stop with deceleration
             self.motors.stop()
         elif newState == State.estop:
             #stop instantly (no deceleration) - used for bumper or really close ultrasonic measurements
             self.motors.estop()
             time.sleep(2)
-            self.changeState(State.canceled)
+            self.changeState(State.cancelled)
         elif newState == State.moveForward:
             #self.motors.moveForward()
             pass
@@ -76,9 +76,9 @@ class Control:
             elif self.frontGreenBtn or self.backYellowBtn:
                 self.changeState(State.moveBackward)
             #or front/back ultrasonic detects close object: then slow down and eventually stop
-            #or end of furrow detected: then change state to canceled
+            #or end of furrow detected: then change state to cancelled
 
-            if self.currentState > State.canceled:  # Robot not stopped
+            if self.currentState > State.cancelled:  # Robot not stopped
                 #Request most recent values from side ultrasonic
 
                 #Request most recent values from camera
@@ -91,7 +91,7 @@ class Control:
                 #Call Kalman filter with most recent values
 
                 #Run PID with those values
-                angle= self.PID.update(0)
+                angle = self.PID.update(0)
 
                 #Update motor speeds
                 if self.currentState == State.moveForward:
