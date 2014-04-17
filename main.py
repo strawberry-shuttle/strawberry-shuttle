@@ -99,8 +99,6 @@ class Control:
         while True:
             #Update btn and bumper states
             self.updateState()
-            
-
             if self.currentState > State.cancelled:  # Robot not stopped
                self.moveInFurrow()
 
