@@ -36,6 +36,15 @@ class UltrasonicSensors:
         self.frontSensor.ping()
         return self.frontDistance
 
+    def readBack(self):
+        self.backDistance = self.backSensor.read()
+        self.backSensor.ping()
+        return self.backDistance
+
+    def updateDistances(self):
+        self.readFront()
+        self.readBack()
+
     def getSpeedScalingFront(self):
         if self.frontDistance <= self.distanceStop:
             return 0
@@ -45,15 +54,6 @@ class UltrasonicSensors:
         if self.backDistance <= self.distanceStop:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
-
-    def readBack(self):
-        self.backDistance = self.backSensor.read()
-        self.backSensor.ping()
-        return self.backDistance
-
-    def updateDistances(self):
-        self.readFront()
-        self.readBack()
 
     def calculateAngle(self):
         self.updateDistances()
