@@ -59,22 +59,6 @@ class Control:
             #self.motors.moveBackward()
         self.currentState = newState
 
-    def detectObstacles(self):
-        if self.currentState == State.moveForward:
-            #Request reading from front ultrasonic
-            pass
-        elif self.currentState == State.moveBackward:
-            #Request reading from back ultrasonic
-            pass
-
-    def detectEndOfFurrow(self):
-        if self.currentState == State.moveForward:
-            #Request reading from the 2 side front ultrasonics
-            pass
-        elif self.currentState == State.moveBackward:
-            #Request reading from the 2 side back ultrasonics
-            pass
-
     def detectButtonState(self):
         return Button.noBtn
 
