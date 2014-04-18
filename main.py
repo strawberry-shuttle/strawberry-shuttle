@@ -2,9 +2,11 @@ __author__ = 'Scotty Waggoner, Vijay Ganesan'
 import time
 from enum import Enum
 from drivers.motors import Motors
+from drivers.ultrasonic_sensors import UltrasonicSensors
 from PID.encoderAngle import EncoderProtractor
 from PID.PID import PIDControl
 #from kalman.kalman import Kalman
+
 
 class State(Enum):
     estop = 1
@@ -18,6 +20,7 @@ class State(Enum):
     #moveForwardDistance = 5
     #moveBackwardDistance = 6
 
+
 class Button(Enum):
     noBtn = 0
     redBtn = 1
@@ -26,9 +29,11 @@ class Button(Enum):
     frontBumper = 8
     backBumper = 16
 
+
 class Control:
     def __init__(self):
         self.motors = Motors()
+        self.ultrasonicSensors = UltrasonicSensors()
         self.currentState = State.moveForward  # Should start out as State.canceled once robot is stand-alone
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
@@ -75,8 +80,7 @@ class Control:
 
     def updateState(self):
             buttonState = self.detectButtonState() #Detect buttons and bumpers from GPIO
-            end_of_furrow = self.detectEndOfFurrow() #Information from side ultrasonics
-            obstacles = self.detectObstacles() #Information from front/back ultrasonics
+            end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
 
             state = self.currentState
             moving = state & State.moving
@@ -94,8 +98,6 @@ class Control:
             elif ( (buttonState & Button.backBtn) or ((buttonState & Button.frontBumper) and stopped) ):
                 self.currentState = State.moveBackward
 
-            #or front/back ultrasonic detects close object: then slow down and eventually stop
-
     def moveInFurrow(self):
         #Request most recent values from side ultrasonic
 
@@ -111,11 +113,23 @@ class Control:
         #Run PID with those values
         angle = self.PID.update(0)
 
+        #TODO: update speed from angle, Kalman, and PID
+        leftSpeed = 4
+        rightSpeed = 4
+
         #Update motor speeds
         if self.currentState == State.moveForward:
-            self.motors.moveForward(4, 4)
+            #Slow down if obstacle
+            leftSpeed *= self.ultrasonicSensors.getSpeedScalingFront()
+            rightSpeed *= self.ultrasonicSensors.getSpeedScalingFront()
+
+            self.motors.moveForward(leftSpeed, rightSpeed)
         elif self.currentState == State.moveBackward:
-            self.motors.moveBackward(4, 4)
+            #Slow down if obstacle
+            leftSpeed *= self.ultrasonicSensors.getSpeedScalingBack()
+            rightSpeed *= self.ultrasonicSensors.getSpeedScalingBack()
+
+            self.motors.moveBackward(leftSpeed, rightSpeed)
 
         #Print debug info
         self.motors.printCurrents()
@@ -123,15 +137,14 @@ class Control:
         print "Angle from encoders ", encoderAngle
         time.sleep(0.25)  # To see debug info
 
-    def run(self): #Main function
+    def run(self):  # Main function
         while True:
-            #self.updateUltrasonic_side()
-            #self.updateUltrasonic_front()
+            self.ultrasonicSensors.updateDistances()  # Used to get data for end of furrow detection, obstacle detection, and distances for navigation
 
             #Update btn and bumper states
             self.updateState()
             if self.currentState > State.cancelled:  # Robot not stopped
-               self.moveInFurrow() #Handles all the navigation, speeds, etc...
+                self.moveInFurrow()  # Handles all the navigation, speeds, etc...
 
 robot = Control()
 robot.run()
