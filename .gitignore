@@ -3,3 +3,4 @@ natcar-prototype/Debug/
 .idea
 *.pyc
 *.pyo
+*.DS_STORE
