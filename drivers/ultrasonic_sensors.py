@@ -32,12 +32,16 @@ class UltrasonicSensors:
         self.backRightDistance = 0
 
     def readFront(self):
-        self.frontDistance = self.frontSensor.read()
+        newDistance = self.frontSensor.read()
+        if newDistance != -1:
+            self.frontDistance = newDistance
         self.frontSensor.ping()
         return self.frontDistance
 
     def readBack(self):
-        self.backDistance = self.backSensor.read()
+        newDistance = self.backSensor.read()
+        if newDistance != -1:
+            self.backDistance = newDistance
         self.backSensor.ping()
         return self.backDistance
 
