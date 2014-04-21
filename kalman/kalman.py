@@ -9,17 +9,25 @@ import time
 
 # Implements a linear Kalman filter.
 class KalmanFilterLinear(object):
-  def __init__(self,_A, _B, _H, _x, _P, _Q, _R):
-    self.A = _A                      # State transition matrix.
-    self.B = _B                      # Control matrix.
-    self.H = _H                      # Observation matrix.
-    self.current_state_estimate = _x # Initial state estimate.
-    self.current_prob_estimate = _P  # Initial covariance estimate.
-    self.Q = _Q                      # Estimated error in process.
-    self.R = _R                      # Estimated error in measurements.
+	# I know, I know, VIJAY: you can turn this into a readme if you want, but nice to have now, while working on it
+	# A: State transition matrix.
+  # B: Control matrix.
+  # H: Observation matrix.
+  # current_state_estimate: state estimate.
+  # current_prob_estimate: covariance estimate.
+  # Q: Estimated error in process.
+  # R: Estimated error in measurements.
+  def __init__(self, kalmanParameters):
+ 
+
+    self.A, self.B, self.H, self.current_state_estimate, \ 
+    self.current_prob_estimate, self.Q, self.R = kalmanParameters
+
     self.startTime = time.time()
+
   def GetCurrentState(self):
     return self.current_state_estimate
+
   def Step(self,control_vector,measurement_vector):
     #---------------------------Prediction step-----------------------------
     predicted_state_estimate = self.A * self.current_state_estimate + self.B * control_vector
@@ -37,9 +45,26 @@ class KalmanFilterLinear(object):
     size = self.current_prob_estimate.shape[0]
     # eye(n) = nxn identity matrix.
     self.current_prob_estimate = (numpy.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
+
+def setUpMatrices(dt):
+	#oops these are not right yet. Oliver and I need to do more work on this
+	A = np.matrix([[1, 0, dt, 0 ],[0, 1, 0, dt],[0, 0, 1, 0],[0,0,0,1]])
+	B = np.matrix([[0,0],[0,0],[1,0],[0,1]])
+	H = np.matrix([[1, 0, 0, 0 ],[0, 1, 0, 0],[0, 0, 0, 0],[0,0,0,0]])
+	#x =   #[theta, x, v, delta_s] delta_s is displacement from side
+
+
+
+
+
+	return [A, B, H, x, P, Q, R]
+
+
 		
 if __name__ == "__main__":
 	dt = 0.0001 #we need to calculate this
-	A = np.matrix([[1, 0, dt, 0 ],[0, 1, 0, dt],[])
+	kalman = KalmanFilterLinear(setUpMatrices(dt))
+	
+	
 
 
