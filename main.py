@@ -3,8 +3,8 @@ import time
 from enum import Enum
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
-from PID.encoderAngle import EncoderProtractor
-from PID.PID import PIDControl
+from control.PID.encoderAngle import EncoderProtractor
+from control.PID.PID import PIDControl
 #from kalman.kalman import Kalman
 
 
