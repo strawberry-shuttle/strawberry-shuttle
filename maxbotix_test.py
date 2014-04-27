@@ -1,4 +1,6 @@
 from drivers.maxbotix import Ultrasonic_MB as US
+from time import sleep
+
 
 ultrasonic_front = US() #Uses default address
 
