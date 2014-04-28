@@ -1,4 +1,4 @@
-__author__ = 'Scotty Waggoner, Vijay Ganesan'
+__author__ = 'Scotty Waggoner, Vijay Ganesan, Evan Racah'
 import time
 from enum import Enum
 from control.state import StateManager
@@ -8,7 +8,7 @@ from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
 from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
-#from kalman.kalman import Kalman
+from kalman.kalman import KalmanFilterLinear, setUpMatrices
 
 '''
 class Button(Enum):
@@ -35,6 +35,7 @@ class Control:
         self.stateManager = StateManager()
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
+        self.kalman = KalmanFilterLinear(setUpMatrices(dt))
 
     def changeState(self, newState):
         self.stateManager.changeState(self,newState)
