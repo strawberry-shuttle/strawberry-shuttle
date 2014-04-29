@@ -7,7 +7,7 @@ from drivers.buttons import Buttons
 from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
-import mechInfo
+import mechInfo #constants
 import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
