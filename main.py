@@ -1,12 +1,10 @@
 __author__ = 'Scotty Waggoner, Vijay Ganesan, Evan Racah'
-import time
-from enum import Enum
-from control.state import StateManager
-from control.state import State #Enum class
-from control.state import Button #Enum class
+from control.state.state import StateManager
+from control.state.state import State  # Enum class
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
-from control.PID.encoderAngle import EncoderProtractor, getRPSDiff
+from drivers.buttons import Buttons
+from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
 import mechInfo
@@ -14,6 +12,8 @@ import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
 #POsitive angle means turned to right -> we could change this
+
+#Speed unit is Revolutions per Second (RPS)
 '''
 class Button(Enum):
     noBtn = 0
@@ -37,89 +37,53 @@ class Control:
         self.motors = Motors()
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
+        self.buttons = Buttons()
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
-        self.kalman = KalmanFilterLinear(setUpMatrices(dt))
+        self.kalman = KalmanFilterLinear(setUpMatrices(dt))  # dt is undefined
         self.commandedRPSDiff = 0
-        self.robotRPS = mechInfo.desiredSpeed
+        self.desiredSpeed = self.motors.maxSpeed() * 0.9  # Maybe multiplied by percent of max speed
 
-    def changeState(self, newState):
-        self.stateManager.changeState(self,newState)
-        if newState == State.canceled:
-            #stop with deceleration
-            self.motors.stop()
-        elif newState == State.estop:
-            #stop instantly (no deceleration) - used for bumper or really close ultrasonic measurements
-            self.motors.estop()
-            time.sleep(2)
-            self.changeState(State.canceled)
-        elif newState == State.moveForward:
-            #self.motors.moveForward()
-            pass
-        elif newState == State.moveBackward:
-            #self.motors.moveBackward()
-            pass
-            #elif newState == State.moveForwardDistance:
-            #self.motors.moveForward()
-            #elif newState == State.moveBackwardDistance:
-            #self.motors.moveBackward()
-        self.currentState = newState
-
-    def detectButtonState(self):
-        return Button.noBtn
-
-    def updateState(self):
-            buttonState = self.detectButtonState()  # Detect buttons and bumpers from GPIO
-            end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
-            self.stateManager.updateState()
+    def obstacleSpeedScaling(self):
+        if self.stateManager.currentState == State.moveForward:
+            return self.ultrasonicSensors.getSpeedScalingFront()
+        elif self.stateManager.currentState == State.moveBackward:
+            return self.ultrasonicSensors.getSpeedScalingBack()
 
     def getMeasurements(self):
-        ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
+        ultrasonicAngle = self.ultrasonicSensors.calculateAngleAndOffset()
         #cameraAngle =
-        RPSDiff = getRPSDiff(self.motors.readEncoders())
+        RPSDiff = self.motors.getSpeedDiff()
         return np.matrix([[ultrasonicAngle], [RPSDiff]]) #camera angle eventually
 
-    def move(self,speed,RPSDiff):
-        RPSIncrement = RPSDiff / 2
-        if self.currentState == State.moveForward:
-            self.motors.moveForward(speed + RPSIncrement, speed - RPSIncrement)
-        elif self.currentState == State.moveBackward:
-            self.motors.moveBackward(speed + RPSIncrement, speed - RPSIncrement)
-
-    def obstacleCheck():
-        if self.currentState == State.moveForward:
-            self.robotRPS = self.ultrasonicSensors.getSpeedScalingFront()
-        elif self.currentState == State.moveBackward:
-            self.robotRPS = self.ultrasonicSensors.getSpeedScalingBack()
-
-    def determineSpeedInput():
+    def determineSpeedInput(self):
         self.measVector = self.getMeasurements()
         self.controlVector = np.matrix([[self.commandedRPSDiff]])
-        self.kalman.Step(self.controlVector,self.measVector)
-        self.curAngle = kalman.GetCurrentState()
+        self.kalman.Step(self.controlVector, self.measVector)
+        self.curAngle = self.kalman.GetCurrentState()
         return self.PID.update(self.curAngle)
 
-    def moveInFurrow(self, speed):
-        self.robotRPS = speed #set robotrps to initial speed desired
-        self.obstacleCheck() #slow robotrps if obstacle detected
-        self.commandedRPSDiff = self.determineSpeedInput() #get speedinput from meas/kalman/pid
-        self.move(self.robotRPS,self.commandedRPSDiff) #move forward or backward
-
+    def moveInFurrow(self):
+        scaledSpeed = self.desiredSpeed * self.obstacleSpeedScaling()  # slow robot if obstacle detected
+        self.commandedRPSDiff = self.determineSpeedInput()  # get differential steering data from meas/kalman/pid
+        speedIncrement = self.commandedRPSDiff / 2
+        if self.stateManager.currentState == State.moveForward:
+            self.motors.moveForward(scaledSpeed + speedIncrement, scaledSpeed - speedIncrement)
+        elif self.stateManager.currentState == State.moveBackward:
+            self.motors.moveBackward(scaledSpeed + speedIncrement, scaledSpeed - speedIncrement)
 
     def run(self):  # Main function
         while True:
-             #Update btn and bumper states
-            self.updateState()
-            if self.currentState > State.canceled:  # Robot not stopped but wait nobtn is 0??
-                self.moveInFurrow(speed)  # Handles all the navigation, speeds, etc...
+            self.buttons.updateButtonStates()
+            self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
+            if self.stateManager.currentState > State.canceled:  # Robot not stopped but wait nobtn is 0??
+                self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else:
-                if self.currentState == State.canceled:
-                    self.motors.stop()
-                else:
+                if self.stateManager.currentState == State.canceled:
+                    self.motors.stop()  # Doing this repeatedly might send too many serial packets to the Roboclaw
+                elif self.stateManager.currentState == State.estop:
                     self.motors.estop()
-                self.currentState = State.stopped
-          
-                
+
 
 if __name__ == "__main__":
     robot = Control()
