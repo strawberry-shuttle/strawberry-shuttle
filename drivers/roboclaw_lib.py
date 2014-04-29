@@ -93,7 +93,6 @@ class Roboclaw:
     def __write_checksum(self):
         return self.__write_byte(self.checksum & 0x7F)
 
-
     def m1_forward(self, val):
         self.__send_command(0)
         self.__write_byte(val)

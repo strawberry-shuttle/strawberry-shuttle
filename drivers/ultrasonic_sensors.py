@@ -2,6 +2,7 @@ from __future__ import division
 __author__ = 'Scotty Waggoner'
 
 from drivers.maxbotix import Ultrasonic_MB
+from drivers.ks import Ultrasonic_KS
 
 
 class UltrasonicSensors:
@@ -12,17 +13,17 @@ class UltrasonicSensors:
 
         self.frontSensor = Ultrasonic_MB(0x70)
         self.backSensor = Ultrasonic_MB(0x71)
-        #self.frontLeftSensor = Ultrasonic_KS103(0xD0)
-        #self.backLeftSensor = Ultrasonic_KS103(0xD2)
-        #self.frontRightSensor = Ultrasonic_KS103(0xD4)
-        #self.backRightSensor = Ultrasonic_KS103(0xD6)
+        self.frontLeftSensor = Ultrasonic_KS(0xD0)
+        self.backLeftSensor = Ultrasonic_KS(0xD2)
+        self.frontRightSensor = Ultrasonic_KS(0xD4)
+        self.backRightSensor = Ultrasonic_KS(0xD6)
 
         self.frontSensor.ping()
         self.backSensor.ping()
-        #self.frontLeftSensor.ping()
-        #self.backLeftSensor.ping()
-        #self.frontRightSensor.ping()
-        #self.backRightSensor.ping()
+        self.frontLeftSensor.ping()
+        self.backLeftSensor.ping()
+        self.frontRightSensor.ping()
+        self.backRightSensor.ping()
 
         self.frontDistance = 0
         self.backDistance = 0
@@ -45,9 +46,41 @@ class UltrasonicSensors:
         self.backSensor.ping()
         return self.backDistance
 
+    def readFrontLeft(self):
+        newDistance = self.frontLeftSensor.read()
+        if newDistance != -1:
+            self.frontLeftDistance = newDistance
+        self.frontLeftSensor.ping()
+        return self.frontLeftDistance
+
+    def readBackLeft(self):
+        newDistance = self.backLeftSensor.read()
+        if newDistance != -1:
+            self.backLeftDistance = newDistance
+        self.backLeftSensor.ping()
+        return self.backLeftDistance
+
+    def readFrontRight(self):
+        newDistance = self.frontRightSensor.read()
+        if newDistance != -1:
+            self.frontRightDistance = newDistance
+        self.frontRightSensor.ping()
+        return self.frontRightDistance
+
+    def readBackRight(self):
+        newDistance = self.backRightSensor.read()
+        if newDistance != -1:
+            self.backRightDistance = newDistance
+        self.backRightSensor.ping()
+        return self.backRightDistance
+
     def updateDistances(self):
         self.readFront()
         self.readBack()
+        self.readFrontLeft()
+        self.readBackLeft()
+        self.readFrontRight()
+        self.readBackRight()
 
     def getSpeedScalingFront(self):
         if self.frontDistance <= self.distanceStop:
