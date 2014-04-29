@@ -4,6 +4,7 @@ __author__ = 'Scotty Waggoner'
 import Adafruit_BBIO.GPIO as GPIO
 from control.state.state import ButtonState
 
+
 class Buttons:
 
     def __init__(self):

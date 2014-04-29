@@ -22,10 +22,10 @@ class PIDControl(object):
         self.now = time.time()
         self.timeInterval = self.now - self.lastTime
         self._calcErrorTerms(measurement)
-        self.input = self._calcInput()
+        input = self._calcInput()
         self.lastTime = self.now
         self.previousError = self.error
-        return self.input
+        return input
 
     def set_set_point(self, setpoint):
         self.setpoint = setpoint

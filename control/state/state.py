@@ -3,6 +3,7 @@ __author__ = 'Vijay Ganesan'
 
 from enum import Enum
 
+
 class State(Enum):
     estop = 1
     canceled = 2 #  This is 'murica
@@ -11,6 +12,7 @@ class State(Enum):
     moveBackward = 8
     moving = 12 #  Either moving forward or backwards
    
+
 class ButtonState(Enum):
     noBtn = 0
     stopBtn = 1
@@ -19,11 +21,13 @@ class ButtonState(Enum):
     frontBumper = 8
     backBumper = 16
 	
+
 class StateManager:
     def __init__(self):
         self.currentState = State.moveForward
         #self.current = State.canceled
-    def currentState(self):
+
+    def getCurrentState(self):
         return self.currentState
 
     def updateState(self, button_state, end_of_furrow):
@@ -35,7 +39,7 @@ class StateManager:
         if ( (button_state & ButtonState.stopBtn) or ( (buttonState & (ButtonState.backBumper | ButtonState.frontBumper) ) and moving ) ):
             self.currentState = State.estop
         elif end_of_furrow: #Slow down and stop if end of furrow
-            self.currenState = State.canceled
+            self.currentState = State.canceled
         #Move Forward if back bumper and not moving, or the front button is hit
         elif ( (button_state & ButtonState.frontBtn) or ((buttonState & ButtonState.backBumper) and stopped) ):
             self.currentState = State.moveForward
@@ -46,4 +50,3 @@ class StateManager:
         
     def changeState(self, newState):
         self.currentState = newState
-        

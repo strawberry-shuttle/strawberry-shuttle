@@ -35,18 +35,12 @@ class EncoderProtractor:
         return self.angle
 
 if __name__== "__main__":
-	encAngle = EncoderProtractor(0, 12.5, 10);
-	motor = Motors()
-	motor.moveForward(3,4)
-	while(1):
+    encAngle = EncoderProtractor(0, 12.5, 10)
+    motors = Motors()
+    motors.moveForward(3, 4)
+    while True:
 		encc = motors.readEncoders()
 		motors.printEncoders()
 		encoderAngle = encAngle.getAngle(encc)
 		print "Angle from encoders ", encoderAngle
 		time.sleep(0.25)  # To see debug info
-
-
-
-
-
-     
