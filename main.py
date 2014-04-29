@@ -67,6 +67,9 @@ class Control:
             end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
             self.stateManager.updateState()
 
+    def getMeasurements():
+        ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
+        # get camera angle
     def moveInFurrow(self):
         #Request most recent values from side ultrasonic
 

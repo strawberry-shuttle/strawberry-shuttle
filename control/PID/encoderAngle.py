@@ -5,6 +5,12 @@ from __future__ import division
 import time
 from drivers.motors import Motors
 
+def getRPSDiff(enc, encoderResolution=1024): #caculates rotations per second of wheel
+    encLeft = enc[0]
+    encRight = enc[1]
+    return (encLeft - encRight) / encoderResolution
+
+
 class EncoderProtractor:
     def __init__(self, initialAngle, wheelCircumference, robotDiameter):
         self.angle = initialAngle

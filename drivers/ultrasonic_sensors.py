@@ -61,7 +61,7 @@ class UltrasonicSensors:
 
     def calculateAngle(self):
         self.updateDistances()
-        #TODO: implement calculations. Do we need distance from center also?
+        #TODO: implement calculations. Do we need distance from center also? YES
         return 0
 
     def endOfFurrow(self):
