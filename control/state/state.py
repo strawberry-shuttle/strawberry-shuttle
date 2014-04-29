@@ -11,7 +11,7 @@ class State(Enum):
     moveForward = 4
     moveBackward = 8
     moving = 12 #  Either moving forward or backwards
-   
+
 
 class ButtonState(Enum):
     noBtn = 0
@@ -20,7 +20,7 @@ class ButtonState(Enum):
     backBtn = 4 #  Send in front and Follow in back
     frontBumper = 8
     backBumper = 16
-	
+
 
 class StateManager:
     def __init__(self):

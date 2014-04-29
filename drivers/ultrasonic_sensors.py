@@ -75,12 +75,13 @@ class UltrasonicSensors:
         return self.backRightDistance
 
     def updateDistances(self):
+        #Attempted to order so pings don't interfere with each other. Not sure if this actually matters
+        self.readFrontLeft()
+        self.readBackRight()
         self.readFront()
         self.readBack()
-        self.readFrontLeft()
         self.readBackLeft()
         self.readFrontRight()
-        self.readBackRight()
 
     def getSpeedScalingFront(self):
         if self.frontDistance <= self.distanceStop:
@@ -92,7 +93,7 @@ class UltrasonicSensors:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def calculateAngle(self,state): #should give a different angle based on if we are moving forward or backward
+    def calculateAngleAndOffset(self, state): #should give a different angle based on if we are moving forward or backward
         self.updateDistances()
         #TODO: implement calculations. Do we need distance from center also? YES
         return 0

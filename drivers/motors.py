@@ -17,14 +17,14 @@ class Motors:
         self.back_motors = Roboclaw(0x81, "/dev/ttyO1")
 
         self.encoderResolution = 1024
-        self.maxSpeed = 4400  # Units of pulses per second. 100% of power is given at this encoder reading (~4.3 rev/sec)
+        self.maxPulsesPerSecond = 4400  # Units of pulses per second. 100% of power is given at this encoder reading (~4.3 rev/sec)
         self.acceleration = 2200  # pulses per second per second
 
         self.p = int(1.0 * 65536)
         self.i = int(0.5 * 65536)
         self.d = int(0.25 * 65536)
-        self.front_motors.set_m1_pidq(self.p, self.i, self.d, self.maxSpeed)
-        self.front_motors.set_m2_pidq(self.p, self.i, self.d, self.maxSpeed)
+        self.front_motors.set_m1_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
+        self.front_motors.set_m2_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
         #self.back_motors.set_m1_pidq(self.p, self.i, self.d, self.maxSpeed)
         #self.back_motors.set_m2_pidq(self.p, self.i, self.d, self.maxSpeed)
 
@@ -33,6 +33,9 @@ class Motors:
 
     def pulsesToRev(self, pulses):  # Convert pulses per second to revolutions per second
         return pulses / self.encoderResolution
+
+    def maxSpeed(self):
+        return self.pulsesToRev(self.maxPulsesPerSecond)
 
     def stop(self):  # Stop with deceleration
         self.front_motors.set_m1_speed_accel(self.acceleration, 0)
@@ -75,6 +78,10 @@ class Motors:
         left = self.pulsesToRev(left * 125)
         right = self.pulsesToRev(right * 125)
         return left, right  # Returns values in revolutions per second
+
+    def getSpeedDiff(self):
+        encLeft, encRight = self.readEncoders()
+        return encLeft - encRight
 
     def printCurrents(self):
         m1cur, m2cur = self.front_motors.read_currents()

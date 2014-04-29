@@ -20,16 +20,18 @@ class Buttons:
         GPIO.add_event_detect("P8_10", GPIO.FALLING)  # Back Button
         GPIO.add_event_detect("P8_11", GPIO.FALLING)  # Stop Button
 
+        self.buttonState = ButtonState.noBtn
+
     def updateButtonStates(self):
-        buttonState = 0
+        self.buttonState = ButtonState.noBtn
         if GPIO.event_detected("P8_7"):
-            buttonState |= ButtonState.frontBumper
+            self.buttonState |= ButtonState.frontBumper
         if GPIO.event_detected("P8_8"):
-            buttonState |= ButtonState.backBumper
+            self.buttonState |= ButtonState.backBumper
         if GPIO.event_detected("P8_9"):
-            buttonState |= ButtonState.forwardBtn
+            self.buttonState |= ButtonState.forwardBtn
         if GPIO.event_detected("P8_10"):
-            buttonState |= ButtonState.backBtn
+            self.buttonState |= ButtonState.backBtn
         if GPIO.event_detected("P8_11"):
-            buttonState |= ButtonState.stopBtn
-        return buttonState
+            self.buttonState |= ButtonState.stopBtn
+        return self.buttonState
