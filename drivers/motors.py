@@ -64,16 +64,16 @@ class Motors:
 
     def readEncoders(self):
         #Average
-        left = self.front_motors.read_m1_speed()[0]
-        #left += self.back_motors.read_m1_speed()[0]
+        left = self.front_motors.read_m1_inst_speed()[0]
+        #left += self.back_motors.read_m1_inst_speed()[0]
         #left /= 2
-        right = self.front_motors.read_m2_speed()[0]
-        #right += self.back_motors.read_m2_speed()[0]
+        right = self.front_motors.read_m2_inst_speed()[0]
+        #right += self.back_motors.read_m2_inst_speed()[0]
         #right /= 2
 
-        #Convert pulses per second to revolutions per second
-        left = self.pulsesToRev(left)
-        right = self.pulsesToRev(right)
+        #Convert pulses per 125th of a second to revolutions per second
+        left = self.pulsesToRev(left * 125)
+        right = self.pulsesToRev(right * 125)
         return left, right  # Returns values in revolutions per second
 
     def printCurrents(self):
