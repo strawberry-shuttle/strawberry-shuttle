@@ -59,7 +59,7 @@ class UltrasonicSensors:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def calculateAngle(self):
+    def calculateAngle(self,state): #should give a different angle based on if we are moving forward or backward
         self.updateDistances()
         #TODO: implement calculations. Do we need distance from center also? YES
         return 0
