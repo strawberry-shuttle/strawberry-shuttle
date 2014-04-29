@@ -5,7 +5,7 @@ from __future__ import division
 import time
 from drivers.motors import Motors
 
-def getRPSDiff(enc, encoderResolution=1024): #caculates rotations per second of wheel
+def getRevDiff(enc, encoderResolution=1024): #caculates rotations per second of wheel
     encLeft = enc[0]
     encRight = enc[1]
     return (encLeft - encRight) / encoderResolution
