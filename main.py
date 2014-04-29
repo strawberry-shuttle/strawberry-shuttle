@@ -38,7 +38,7 @@ class Control:
         self.kalman = KalmanFilterLinear(setUpMatrices(dt))
 
     def changeState(self, newState):
-        self.stateManager.changeState(self,newState)
+        self.stateManager.changeState(self, newState)
         if newState == State.canceled:
             #stop with deceleration
             self.motors.stop()
@@ -57,7 +57,6 @@ class Control:
             #self.motors.moveForward()
             #elif newState == State.moveBackwardDistance:
             #self.motors.moveBackward()
-        self.currentState = newState
 
     def detectButtonState(self):
         return Button.noBtn
@@ -65,11 +64,12 @@ class Control:
     def updateState(self):
             buttonState = self.detectButtonState()  # Detect buttons and bumpers from GPIO
             end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
-            self.stateManager.updateState()
+            self.stateManager.updateState(buttonState, end_of_furrow)
 
-    def getMeasurements():
+    def getMeasurements(self):
         ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
         # get camera angle
+
     def moveInFurrow(self):
         #Request most recent values from side ultrasonic
 
@@ -112,11 +112,10 @@ class Control:
 
     def run(self):  # Main function
         while True:
-            self.ultrasonicSensors.updateDistances()  #  Used to get data for end of furrow detection, obstacle detection, and distances for navigation
-
             #Update btn and bumper states
             self.updateState()
             if self.currentState > State.cancelled:  # Robot not stopped
+                self.ultrasonicSensors.updateDistances()  #  Used to get data for end of furrow detection, obstacle detection, and distances for navigation
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
 
 robot = Control()
