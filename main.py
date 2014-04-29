@@ -6,10 +6,11 @@ from control.state import State #Enum class
 from control.state import Button #Enum class
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
-from control.PID.encoderAngle import EncoderProtractor
+from control.PID.encoderAngle import EncoderProtractor, getRPSDiff
 from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
-
+import mechInfo
+import numpy as np
 '''
 class Button(Enum):
     noBtn = 0
@@ -36,6 +37,8 @@ class Control:
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
         self.kalman = KalmanFilterLinear(setUpMatrices(dt))
+        self.commandedRPSDiff = 0
+        self.robotRPS = mechInfo.desiredSpeed
 
     def changeState(self, newState):
         self.stateManager.changeState(self,newState)
@@ -67,57 +70,53 @@ class Control:
             end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
             self.stateManager.updateState()
 
-    def getMeasurements():
+    def getMeasurements(self):
         ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
-        # get camera angle
-    def moveInFurrow(self):
-        #Request most recent values from side ultrasonic
+        #cameraAngle =
+        RPSDiff = getRPSDiff(self.motors.readEncoders())
+        return np.matrix([[ultrasonicAngle], [RPSDiff]]) #camera angle eventually
 
-        #Request most recent values from camera
-
-        #Request most recent values from encoders
-        encoderAngle = self.encoderProtractor.getAngle(self.motors.readEncoders())
-
-        #Call angle calculation for ultrasonic
-
-        #Call Kalman filter with most recent values
-
-        #Run PID with those values
-        angle = self.PID.update(0)
-
-        #TODO: update speed from angle, Kalman, and PID
-        leftSpeed = 4
-        rightSpeed = 4
-
-        #Update motor speeds
-        #I think this should be moved into its own class [Vijay]
+    def move(self,speed,RPSDiff):
         if self.currentState == State.moveForward:
-            #Slow down if obstacle
-            leftSpeed *= self.ultrasonicSensors.getSpeedScalingFront()
-            rightSpeed *= self.ultrasonicSensors.getSpeedScalingFront()
-
-            self.motors.moveForward(leftSpeed, rightSpeed)
+            self.motors.moveForward(speed + RPSDiff, speed - RPSDiff)
         elif self.currentState == State.moveBackward:
-            #Slow down if obstacle
-            leftSpeed *= self.ultrasonicSensors.getSpeedScalingBack()
-            rightSpeed *= self.ultrasonicSensors.getSpeedScalingBack()
+            self.motors.moveBackward(speed + RPSDiff, speed - RPSDiff)
 
-            self.motors.moveBackward(leftSpeed, rightSpeed)
+    def obstacleCheck():
+        if self.currentState == State.moveForward:
+            self.robotRPS = self.ultrasonicSensors.getSpeedScalingFront()
+        elif self.currentState == State.moveBackward:
+            self.robotRPS = self.ultrasonicSensors.getSpeedScalingBack()
 
-        #Print debug info
-        self.motors.printCurrents()
-        self.motors.printEncoders()
-        print("Angle from encoders " % encoderAngle)
-        time.sleep(0.25)  # To see debug info
+    def determineSpeedInput():
+        self.measVector = self.getMeasurements()
+        self.controlVector = np.matrix([[self.commandedRPSDiff]])
+        self.kalman.Step(self.controlVector,self.measVector)
+        self.curAngle = kalman.GetCurrentState()
+        return self.PID.update(self.curAngle)
+
+    def moveInFurrow(self, speed):
+        self.robotRPS = speed #set robotrps to initial speed desired
+        self.obstacleCheck() #slow robotrps if obstacle detected
+        self.commandedRPSDiff = self.determineSpeedInput() #get speedinput from meas/kalman/pid
+        self.move(self.robotRPS,self.commandedRPSDiff) #move forward or backward
+
 
     def run(self):  # Main function
         while True:
-            self.ultrasonicSensors.updateDistances()  #  Used to get data for end of furrow detection, obstacle detection, and distances for navigation
-
-            #Update btn and bumper states
+             #Update btn and bumper states
             self.updateState()
-            if self.currentState > State.cancelled:  # Robot not stopped
-                self.moveInFurrow()  # Handles all the navigation, speeds, etc...
+            if self.currentState > State.canceled:  # Robot not stopped but wait nobtn is 0??
+                self.moveInFurrow(speed)  # Handles all the navigation, speeds, etc...
+            else:
+                if self.currentState == State.canceled:
+                    self.motors.stop()
+                else:
+                    self.motors.estop()
+                self.currentState = State.stopped
+          
+                
 
-robot = Control()
-robot.run()
+if __name__ == "__main__":
+    robot = Control()
+    robot.run()
