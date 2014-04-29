@@ -11,9 +11,9 @@ class State(Enum):
     moveBackward = 8
     moving = 12 #  Either moving forward or backwards
    
-class Button(Enum):
+class ButtonState(Enum):
     noBtn = 0
-    redBtn = 1
+    stopBtn = 1
     forwardBtn = 2 #  Send in back and Follow in front
     backBtn = 4 #  Send in front and Follow in back
     frontBumper = 8
@@ -32,15 +32,15 @@ class StateManager:
         stopped = state & State.stopped
 
         #Emergency Stop if red button, or bumpers hit in moving state
-        if ( (button_state & Button.redBtn) or ( (buttonState & (Button.backBumper | Button.frontBumper) ) and moving ) ):
+        if ( (button_state & ButtonState.stopBtn) or ( (buttonState & (ButtonState.backBumper | ButtonState.frontBumper) ) and moving ) ):
             self.currentState = State.estop
         elif end_of_furrow: #Slow down and stop if end of furrow
             self.currenState = State.canceled
         #Move Forward if back bumper and not moving, or the front button is hit
-        elif ( (button_state & Button.frontBtn) or ((buttonState & Button.backBumper) and stopped) ):
+        elif ( (button_state & ButtonState.frontBtn) or ((buttonState & ButtonState.backBumper) and stopped) ):
             self.currentState = State.moveForward
         #Move Backwards if front bumper and not moving, or the back button is hit
-        elif ( (button_state & Button.backBtn) or ((buttonState & Button.frontBumper) and stopped) ):
+        elif ( (button_state & ButtonState.backBtn) or ((buttonState & ButtonState.frontBumper) and stopped) ):
             self.currentState = State.moveBackward
         return self.currentState
         
