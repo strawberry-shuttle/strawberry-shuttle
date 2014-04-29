@@ -11,6 +11,9 @@ from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
 import mechInfo
 import numpy as np
+
+#POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
+#POsitive angle means turned to right -> we could change this
 '''
 class Button(Enum):
     noBtn = 0
@@ -41,7 +44,7 @@ class Control:
         self.robotRPS = mechInfo.desiredSpeed
 
     def changeState(self, newState):
-        self.stateManager.changeState(self, newState)
+        self.stateManager.changeState(self,newState)
         if newState == State.canceled:
             #stop with deceleration
             self.motors.stop()
@@ -60,6 +63,7 @@ class Control:
             #self.motors.moveForward()
             #elif newState == State.moveBackwardDistance:
             #self.motors.moveBackward()
+        self.currentState = newState
 
     def detectButtonState(self):
         return Button.noBtn
@@ -67,38 +71,20 @@ class Control:
     def updateState(self):
             buttonState = self.detectButtonState()  # Detect buttons and bumpers from GPIO
             end_of_furrow = self.ultrasonicSensors.endOfFurrow()  # Information from side ultrasonics
-            self.stateManager.updateState(buttonState, end_of_furrow)
+            self.stateManager.updateState()
 
     def getMeasurements(self):
         ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
-<<<<<<< HEAD
         #cameraAngle =
         RPSDiff = getRPSDiff(self.motors.readEncoders())
         return np.matrix([[ultrasonicAngle], [RPSDiff]]) #camera angle eventually
-=======
-        # get camera angle
-
-    def moveInFurrow(self):
-        #Request most recent values from side ultrasonic
-
-        #Request most recent values from camera
-
-        #Request most recent values from encoders
-        encoderAngle = self.encoderProtractor.getAngle(self.motors.readEncoders())
-
-        #Call angle calculation for ultrasonic
-
-        #Call Kalman filter with most recent values
-
-        #Run PID with those values
-        angle = self.PID.update(0)
->>>>>>> dd12082ae931766e8b4a4e7e55d52eca58ba5ff5
 
     def move(self,speed,RPSDiff):
+        RPSIncrement = RPSDiff / 2
         if self.currentState == State.moveForward:
-            self.motors.moveForward(speed + RPSDiff, speed - RPSDiff)
+            self.motors.moveForward(speed + RPSIncrement, speed - RPSIncrement)
         elif self.currentState == State.moveBackward:
-            self.motors.moveBackward(speed + RPSDiff, speed - RPSDiff)
+            self.motors.moveBackward(speed + RPSIncrement, speed - RPSIncrement)
 
     def obstacleCheck():
         if self.currentState == State.moveForward:
@@ -122,7 +108,6 @@ class Control:
 
     def run(self):  # Main function
         while True:
-<<<<<<< HEAD
              #Update btn and bumper states
             self.updateState()
             if self.currentState > State.canceled:  # Robot not stopped but wait nobtn is 0??
@@ -139,13 +124,3 @@ class Control:
 if __name__ == "__main__":
     robot = Control()
     robot.run()
-=======
-            #Update btn and bumper states
-            self.updateState()
-            if self.currentState > State.cancelled:  # Robot not stopped
-                self.ultrasonicSensors.updateDistances()  #  Used to get data for end of furrow detection, obstacle detection, and distances for navigation
-                self.moveInFurrow()  # Handles all the navigation, speeds, etc...
-
-robot = Control()
-robot.run()
->>>>>>> dd12082ae931766e8b4a4e7e55d52eca58ba5ff5
