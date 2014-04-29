@@ -1,8 +1,16 @@
 from __future__ import division
 __author__ = 'Scotty Waggoner'
 
+from enum import Enum
 import Adafruit_BBIO.GPIO as GPIO
-from control.state.state import ButtonState
+
+class ButtonState(Enum):
+    noBtn = 0
+    stopBtn = 1
+    forwardBtn = 2 #  Send in back and Follow in front
+    backBtn = 4 #  Send in front and Follow in back
+    frontBumper = 8
+    backBumper = 16
 
 
 class Buttons:

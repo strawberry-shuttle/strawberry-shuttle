@@ -2,6 +2,7 @@ __author__ = 'Vijay Ganesan'
 #Main class for state machine
 
 from enum import Enum
+from drivers.buttons import ButtonState
 
 
 class State(Enum):
@@ -11,15 +12,6 @@ class State(Enum):
     moveForward = 4
     moveBackward = 8
     moving = 12 #  Either moving forward or backwards
-
-
-class ButtonState(Enum):
-    noBtn = 0
-    stopBtn = 1
-    forwardBtn = 2 #  Send in back and Follow in front
-    backBtn = 4 #  Send in front and Follow in back
-    frontBumper = 8
-    backBumper = 16
 
 
 class StateManager:
