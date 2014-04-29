@@ -1,9 +1,6 @@
 __author__ = 'Scotty Waggoner, Vijay Ganesan, Evan Racah'
-import time
-from enum import Enum
 from control.state.state import StateManager
-from control.state.state import State #Enum class
-from control.state.state import ButtonState #Enum class
+from control.state.state import State  # Enum class
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
@@ -43,7 +40,7 @@ class Control:
         self.buttons = Buttons()
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
-        self.kalman = KalmanFilterLinear(setUpMatrices(dt))
+        self.kalman = KalmanFilterLinear(setUpMatrices(dt))  # dt is undefined
         self.commandedRPSDiff = 0
         self.desiredSpeed = self.motors.maxSpeed() * 0.9  # Maybe multiplied by percent of max speed
 
@@ -66,7 +63,7 @@ class Control:
         self.curAngle = self.kalman.GetCurrentState()
         return self.PID.update(self.curAngle)
 
-    def moveInFurrow(self, speed):
+    def moveInFurrow(self):
         scaledSpeed = self.desiredSpeed * self.obstacleSpeedScaling()  # slow robot if obstacle detected
         self.commandedRPSDiff = self.determineSpeedInput()  # get differential steering data from meas/kalman/pid
         speedIncrement = self.commandedRPSDiff / 2
