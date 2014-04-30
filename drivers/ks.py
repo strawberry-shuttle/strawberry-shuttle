@@ -1,3 +1,5 @@
+from __future__ import division
+
 __author__ = 'Vijay Ganesan'
 # Kingsin KS-10X Ultrasonic Sensor API for BBB
 # See ks_test.py for implementation example
@@ -15,5 +17,5 @@ class Ultrasonic_KS:
     def ping(self): #Send signal, -1 if failed
         return self.i2c.write8(0x2,0xbc) #Write to register 2
     def read(self): #Read result, -1 if failed
-        return self.i2c.reverseByteOrder(self.i2c.readU16(0x2))
+        return (self.i2c.reverseByteOrder(self.i2c.readU16(0x2)))/10; #Return in cm
 

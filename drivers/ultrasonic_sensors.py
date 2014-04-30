@@ -3,6 +3,7 @@ __author__ = 'Scotty Waggoner'
 
 from drivers.maxbotix import Ultrasonic_MB
 from drivers.ks import Ultrasonic_KS
+import math
 
 
 class UltrasonicSensors:
@@ -93,8 +94,7 @@ class UltrasonicSensors:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def calculateAngleAndOffset(self, state): #should give a different angle based on if we are moving forward or backward
-        self.updateDistances()
+    def calculateAngle(self, state): #should give a different angle based on if we are moving forward or backward
         #TODO: implement calculations. Do we need distance from center also? YES
         return 0
 
