@@ -75,6 +75,8 @@ class Control:
 
     def run(self):  # Main function
         while True:
+            # TODO: Determine if a sensor is failing, how? Possibly if one ultrasonic shows a max distance, and the other shows a reasonable angle?
+            # TODO: How about for more sensors than just ultrasonics?
             self.buttons.updateButtonStates()
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
             if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped but wait nobtn is 0??

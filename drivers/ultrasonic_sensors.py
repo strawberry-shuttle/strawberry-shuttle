@@ -4,6 +4,7 @@ __author__ = 'Scotty Waggoner'
 from drivers.maxbotix import Ultrasonic_MB
 from drivers.ks import Ultrasonic_KS
 import math
+import mechInfo
 
 
 class UltrasonicSensors:
@@ -95,8 +96,8 @@ class UltrasonicSensors:
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def calculateAngle(self, state): #should give a different angle based on if we are moving forward or backward
-        #TODO: implement calculations. Do we need distance from center also? YES
-        return 0
+        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/mechInfo.distBetweenUS),\
+                math.asin((self.frontRightDistance-self.backRightDistance)/mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):
         if self.frontLeftDistance > 50 and self.frontRightDistance > 50 or self.backLeftDistance > 50 and self.backRightDistance > 50:
