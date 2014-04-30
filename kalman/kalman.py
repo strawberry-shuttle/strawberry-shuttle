@@ -47,7 +47,7 @@ class KalmanFilterLinear(object):
     # eye(n) = nxn identity matrix.
     self.current_prob_estimate = (numpy.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
-def setUpMatrices(dt):
+def setUpMatrices():
   placeError = 0.001 #humanerror in placing robot straight in field
   motorSpinError = 0.00001
   processNoise = 0.001
