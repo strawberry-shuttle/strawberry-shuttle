@@ -3,10 +3,12 @@ __author__ = 'Scotty Waggoner'
 
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
+import mechInfo #constants
 
 # Standalone usage in Python REPL:
 # from drivers.motors import Motors
 # motors = Motors()
+
 
 class Motors:
 
@@ -17,7 +19,7 @@ class Motors:
         self.back_motors = Roboclaw(0x81, "/dev/ttyO1")
 
         self.encoderResolution = 1024
-        self.maxPulsesPerSecond = 4400  # Units of pulses per second. 100% of power is given at this encoder reading (~4.3 rev/sec)
+        self.maxPulsesPerSecond = mechInfo.maxPPS  # Units of pulses per second. 100% of power is given at this encoder reading
         self.acceleration = 2200  # pulses per second per second
 
         self.p = int(1.0 * 65536)
