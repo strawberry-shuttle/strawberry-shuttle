@@ -87,12 +87,36 @@ class Motors:
         return leftFront, rightFront, leftBack, rightBack  # Returns values in revolutions per second
 
     def readEncoderDistanceTraveled(self):
+        underflowConst = 0b00000001
+        overflowConst = 0b00000100
+        maxCount = 4294967295
+
         #Read register values containing pulses count
-        #TODO: deal with underflow and overflow
-        leftFront = self.front_motors.read_m1_encoder()[0]
-        rightFront = self.front_motors.read_m1_encoder()[0]
-        leftBack = self.back_motors.read_m1_encoder()[0]
-        rightBack = self.back_motors.read_m1_encoder()[0]
+        leftFront, leftFrontStatus = self.front_motors.read_m1_encoder()
+        rightFront, rightFrontStatus = self.front_motors.read_m1_encoder()
+        leftBack, leftBackStatus = self.back_motors.read_m1_encoder()
+        rightBack, rightBackStatus = self.back_motors.read_m1_encoder()
+
+        #Adjust for underflow and overflow
+        if leftFrontStatus & underflowConst:
+            self.encoderRevLeftFront += maxCount
+        elif leftFrontStatus & overflowConst:
+            self.encoderRevLeftFront -= maxCount
+
+        if rightFrontStatus & underflowConst:
+            self.encoderRevRightFront += maxCount
+        elif rightFrontStatus & overflowConst:
+            self.encoderRevRightFront -= maxCount
+
+        if leftBackStatus & underflowConst:
+            self.encoderRevLeftBack += maxCount
+        elif leftBackStatus & overflowConst:
+            self.encoderRevLeftBack -= maxCount
+
+        if rightBackStatus & underflowConst:
+            self.encoderRevRightBack += maxCount
+        elif rightBackStatus & overflowConst:
+            self.encoderRevRightBack -= maxCount
 
         #Convert pulses to revolutions
         leftFront = self.pulsesToRev(leftFront)

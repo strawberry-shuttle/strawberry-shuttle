@@ -6,6 +6,7 @@ import time
 from drivers.motors import Motors
 import mechInfo
 
+
 class EncoderProtractor:
     def __init__(self):
         self.angle = 0  # initial angle
@@ -27,8 +28,8 @@ class EncoderProtractor:
         self.encRightPrev = encRight
         return self.angle
 
-if __name__== "__main__":
-    encAngle = EncoderProtractor(0, 12.5, 10)
+if __name__ == "__main__":
+    encAngle = EncoderProtractor()
     motors = Motors()
     motors.moveForward(3, 4)
     while True:
