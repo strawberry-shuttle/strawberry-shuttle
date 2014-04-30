@@ -33,7 +33,7 @@ if __name__== "__main__":
     motors = Motors()
     motors.moveForward(3, 4)
     while True:
-        encc = motors.readEncoders()
+        encc = motors.readEncoderSpeeds()
         motors.printEncoders()
         encoderAngle = encAngle.getAngle(encc)
         print "Angle from encoders ", encoderAngle
