@@ -8,6 +8,7 @@ from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
 import mechInfo #constants
+# TODO: Update constants in mechInfo
 import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
@@ -75,15 +76,14 @@ class Control:
 
     def run(self):  # Main function
         while True:
-            # TODO: Determine if a sensor is failing, how? Possibly if one ultrasonic shows a max distance, and the other shows a reasonable angle?
-            # TODO: How about for more sensors than just ultrasonics?
-            self.buttons.updateButtonStates()
+            #TODO: Get information from cameras
+            self.buttons.updateButtonStates() #TODO: Testing button states
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
             if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped but wait nobtn is 0??
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
-            else:
+            else: #TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:
-                    self.motors.stop()  # Doing this repeatedly might send too many serial packets to the Roboclaw
+                    self.motors.stop()
                 elif self.stateManager.currentState & State.estop:
                     self.motors.estop()
 
