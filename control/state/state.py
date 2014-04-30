@@ -28,15 +28,15 @@ class StateManager:
         stopped = state & State.stopped
 
         #Emergency Stop if red button, or bumpers hit in moving state
-        if ( (button_state & ButtonState.stopBtn) or ( (buttonState & (ButtonState.backBumper | ButtonState.frontBumper) ) and moving ) ):
+        if ( (button_state & ButtonState.stopBtn) or ( (button_state & (ButtonState.backBumper | ButtonState.frontBumper) ) and moving ) ):
             self.currentState = State.estop
         elif end_of_furrow: #Slow down and stop if end of furrow
             self.currentState = State.canceled
         #Move Forward if back bumper and not moving, or the front button is hit
-        elif ( (button_state & ButtonState.frontBtn) or ((buttonState & ButtonState.backBumper) and stopped) ):
+        elif ( (button_state & ButtonState.frontBtn) or ((button_state & ButtonState.backBumper) and stopped) ):
             self.currentState = State.moveForward
         #Move Backwards if front bumper and not moving, or the back button is hit
-        elif ( (button_state & ButtonState.backBtn) or ((buttonState & ButtonState.frontBumper) and stopped) ):
+        elif ( (button_state & ButtonState.backBtn) or ((button_state & ButtonState.frontBumper) and stopped) ):
             self.currentState = State.moveBackward
         return self.currentState
         

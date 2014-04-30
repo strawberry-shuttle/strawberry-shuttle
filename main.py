@@ -40,7 +40,7 @@ class Control:
         self.buttons = Buttons()
         self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
-        self.kalman = KalmanFilterLinear(setUpMatrices(dt))  # dt is undefined
+        self.kalman = KalmanFilterLinear(setUpMatrices())
         self.commandedRPSDiff = 0
         self.desiredSpeed = self.motors.maxSpeed() * 0.9  # Maybe multiplied by percent of max speed
 
@@ -51,7 +51,8 @@ class Control:
             return self.ultrasonicSensors.getSpeedScalingBack()
 
     def getMeasurements(self):
-        ultrasonicAngle = self.ultrasonicSensors.calculateAngleAndOffset()
+        self.ultrasonicSensors.updateDistances()
+        ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
         #cameraAngle =
         RPSDiff = self.motors.getSpeedDiff()
         return np.matrix([[ultrasonicAngle], [RPSDiff]]) #camera angle eventually
@@ -76,14 +77,13 @@ class Control:
         while True:
             self.buttons.updateButtonStates()
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
-            if self.stateManager.currentState > State.canceled:  # Robot not stopped but wait nobtn is 0??
+            if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped but wait nobtn is 0??
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else:
-                if self.stateManager.currentState == State.canceled:
+                if self.stateManager.currentState & State.canceled:
                     self.motors.stop()  # Doing this repeatedly might send too many serial packets to the Roboclaw
-                elif self.stateManager.currentState == State.estop:
+                elif self.stateManager.currentState & State.estop:
                     self.motors.estop()
-
 
 if __name__ == "__main__":
     robot = Control()
