@@ -40,7 +40,7 @@ class Control:
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
         self.buttons = Buttons()
-        self.encoderProtractor = EncoderProtractor(0, mechInfo.wheelCircumference, 10)  # What units should these be in?
+        self.encoderProtractor = EncoderProtractor()
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
         self.kalman = KalmanFilterLinear(setUpMatrices())
         self.commandedRPSDiff = 0

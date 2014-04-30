@@ -4,12 +4,11 @@
 from __future__ import division
 import time
 from drivers.motors import Motors
+import mechInfo
 
 class EncoderProtractor:
-    def __init__(self, initialAngle, wheelCircumference, robotDiameter):
-        self.angle = initialAngle
-        self.robotDiameter = robotDiameter
-        self.wheelCircum = wheelCircumference
+    def __init__(self):
+        self.angle = 0  # initial angle
         self.encLeftPrev = 0
         self.encRightPrev = 0
         self.encLeftDiff = 0
@@ -21,9 +20,9 @@ class EncoderProtractor:
 
         self.encLeftDiff = encLeft - self.encLeftPrev
         self.encRightDiff = encRight - self.encRightPrev
-        d1 = self.encLeftDiff * self.wheelCircum
-        d2 = self.encRightDiff * self.wheelCircum
-        self.angle = ((d1 - d2) / self.robotDiameter) + self.angle
+        d1 = self.encLeftDiff * mechInfo.wheelCircumference
+        d2 = self.encRightDiff * mechInfo.wheelCircumference
+        self.angle += ((d1 - d2) / mechInfo.robotDiameter)
         self.encLeftPrev = encLeft
         self.encRightPrev = encRight
         return self.angle
