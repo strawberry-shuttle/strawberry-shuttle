@@ -14,7 +14,8 @@ class Motors:
 
     def __init__(self):
         UART.setup("UART1")
-
+        self.backAngle = 0
+        self.frontAngle = 0
         self.front_motors = Roboclaw(0x80, "/dev/ttyO1")
         self.back_motors = Roboclaw(0x81, "/dev/ttyO1")
 
@@ -137,6 +138,19 @@ class Motors:
         self.encoderRevRightBack = rightBack
 
         return leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff  # Returns values in revolutions
+
+    def getDiffAngle(self,encLeftDiff,encRightDiff, angle):
+        d1 = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
+        d2 = encRightDiff * (mechInfo.wheelCircumference / self.encoderResolution)
+        angle += ((d1 - d2) / mechInfo.robotWidth)
+        return angle
+
+    def getEncoderAngles():
+         leftFrontDiff, rightFrontDiff, \
+         leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
+         self.backAngle = self.getDiffAngle(leftFrontDiff, rightFrontDiff,self.frontAngle)
+         self.frontAngle = self.getDiffAngle(leftBackDiff, rightBackDiff, self.backAngle)
+         return [self.backAngle, self.frontAngle]
 
     def getSpeedDiff(self):
         leftFront, rightFront, leftBack, rightBack = self.readEncoderSpeeds()

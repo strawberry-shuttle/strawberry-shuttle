@@ -1,3 +1,6 @@
+from __future__ import division, absolute_import
+
+__author__ = 'Evan Racah, Greg Czerniak '
 #Kalman Filter 
 #Evan Racah
 #This class was written  by Greg Czerniak with some modifications
@@ -5,9 +8,12 @@
 
 
 #we need numpy here...
+
 #TODO: calculate dt thru timing
 import numpy as np
 import time
+#import .mechInfo
+G =5
 
 # Implements a linear Kalman filter.
 class KalmanFilterLinear(object):
@@ -22,15 +28,20 @@ class KalmanFilterLinear(object):
   def __init__(self, kalmanParameters):
  
 
-    self.A, self.B, self.H, self.current_state_estimate, \ 
+    self.A, self.B, self.H, self.current_state_estimate, 
     self.current_prob_estimate, self.Q, self.R = kalmanParameters
 
-    self.startTime = time.time()
+    self.lastTime = time.time()
+
 
   def GetCurrentState(self):
     return self.current_state_estimate
 
   def Step(self,control_vector,measurement_vector):
+    self.now = time.time()
+    self.timeStep = self.now - self.lastTime
+    self.A[0,1] = G * self.timeStep #mechInfo.G * self.timeStep
+    self.lastTime = self.now
     #---------------------------Prediction step-----------------------------
     predicted_state_estimate = self.A * self.current_state_estimate + self.B * control_vector
     predicted_prob_estimate = (self.A * self.current_prob_estimate) * numpy.transpose(self.A) + self.Q
@@ -53,12 +64,13 @@ def setUpMatrices():
   motorSpinError = 0.00001
   processNoise = 0.001
   measNoise = 0.001
+  dt = 0 #we dont know this yet but we will correct it before needed
   #G = radius_of_wheeel / width of robot
-	#oops these are not right yet. Oliver and I need to do more work on this
-	A = np.matrix([[1, G * dt],[0, 0]])
-	B = np.matrix([[0],[1]])
-	H = np.matrix([[1, 0],[1,0],[0,1]]) #H = np.matrix([[1, 0],[1,0],[1, 0],[0,1]]) for camera
-	x = np.matrix([[0],[0]])  #[theta, wdiff] 
+
+  A = np.matrix([[1, G *dt],[0, 0]])
+  B = np.matrix([[0],[1]])
+  H = np.matrix([[1, 0],[1,0],[1, 0],[1,0],[0,1],[0,1]]) # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]]) 
+  x = np.matrix([[0],[0]])  #[theta, wdiff] 
   P = np.matrix([[placeError, 0],[0, motorSpinError]]) 
   Q = np.matrix([[processNoise,0],[0, processNoise]]) #process noise
   R = np.matrix([[measNoise,0],[0,measNoise]]) 
@@ -69,7 +81,7 @@ def setUpMatrices():
 		
 if __name__ == "__main__":
 	dt = 0.0001 #we need to calculate this
-	kalman = KalmanFilterLinear(setUpMatrices(dt))
+	kalman = KalmanFilterLinear(setUpMatrices())
 	
 	
 

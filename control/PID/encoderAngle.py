@@ -15,17 +15,10 @@ class EncoderProtractor:
         self.encLeftDiff = 0
         self.encRightDiff = 0
 
-    def getAngle(self, enc):
-        encLeft = enc[0]
-        encRight = enc[1]
-
-        self.encLeftDiff = encLeft - self.encLeftPrev
-        self.encRightDiff = encRight - self.encRightPrev
+    def getAngle(self,encLeftDiff,encRightDiff ):
         d1 = self.encLeftDiff * mechInfo.wheelCircumference
         d2 = self.encRightDiff * mechInfo.wheelCircumference
         self.angle += ((d1 - d2) / mechInfo.robotDiameter)
-        self.encLeftPrev = encLeft
-        self.encRightPrev = encRight
         return self.angle
 
 if __name__ == "__main__":
