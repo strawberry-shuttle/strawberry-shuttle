@@ -13,8 +13,8 @@ import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
 #POsitive angle means turned to right -> we could change this
-
 #Speed unit is Revolutions per Second (RPS)
+
 '''
 class Button(Enum):
     noBtn = 0
@@ -33,17 +33,18 @@ class State(Enum):
     moving = 12 #Either moving forward or backwards
 '''
 
+
 class Control:
     def __init__(self):
         self.motors = Motors()
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
         self.buttons = Buttons()
-        self.encoderProtractor = EncoderProtractor(0, 12.5, 10)  # What units should these be in?
+        self.encoderProtractor = EncoderProtractor()
         self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
         self.kalman = KalmanFilterLinear(setUpMatrices())
         self.commandedRPSDiff = 0
-        self.desiredSpeed = self.motors.maxSpeed() * 0.9  # Maybe multiplied by percent of max speed
+        self.desiredSpeed = self.motors.maxSpeed() * 0.9  # scaled by a (currently arbitrary) percent of max speed
 
     def obstacleSpeedScaling(self):
         if self.stateManager.currentState == State.moveForward:
@@ -55,8 +56,9 @@ class Control:
         self.ultrasonicSensors.updateDistances()
         leftUltrasonicAngle,rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         #cameraAngle =
-        RPSDiff = self.motors.getSpeedDiff()
-        return np.matrix([[ultrasonicAngle], [rightUltrasonicAngle], [RPSDiff]]) #camera angle eventually
+        speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
+        #TODO: add speedDiffBack to matrix also
+        return np.matrix([[ultrasonicAngle], [speedDiffFront]]) #camera angle eventually
 
     def determineSpeedInput(self):
         self.measVector = self.getMeasurements()

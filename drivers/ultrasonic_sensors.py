@@ -95,11 +95,12 @@ class UltrasonicSensors:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def calculateAngle(self, state): #should give a different angle based on if we are moving forward or backward
-        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/mechInfo.distBetweenUS),\
+    def calculateAngle(self, state):  # TODO: should give a different angle based on if we are moving forward or backward
+        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/mechInfo.distBetweenUS),
                 math.asin((self.frontRightDistance-self.backRightDistance)/mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):
-        if self.frontLeftDistance > 50 and self.frontRightDistance > 50 or self.backLeftDistance > 50 and self.backRightDistance > 50:
+        distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow
+        if self.frontLeftDistance > distEOF and self.frontRightDistance > distEOF or self.backLeftDistance > distEOF and self.backRightDistance > distEOF:
             return True
         return False
