@@ -56,7 +56,7 @@ def setUpMatrices():
 	#oops these are not right yet. Oliver and I need to do more work on this
 	A = np.matrix([[1, G * dt],[0, 0]])
 	B = np.matrix([[0],[1]])
-	H = np.matrix([[1, 0],[0,1]]) #H = np.matrix([[1, 0],[1, 0],[0,1]]) for camera
+	H = np.matrix([[1, 0],[1,0],[0,1]]) #H = np.matrix([[1, 0],[1, 0],[0,1]]) for camera
 	x = np.matrix([[0],[0]])  #[theta, wdiff] 
   P = np.matrix([[placeError, 0],[0, motorSpinError]]) 
   Q = np.matrix([[processNoise,0],[0, processNoise]]) #process noise

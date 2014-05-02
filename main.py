@@ -53,10 +53,10 @@ class Control:
 
     def getMeasurements(self):
         self.ultrasonicSensors.updateDistances()
-        ultrasonicAngle = self.ultrasonicSensors.calculateAngle()
+        leftUltrasonicAngle,rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         #cameraAngle =
         RPSDiff = self.motors.getSpeedDiff()
-        return np.matrix([[ultrasonicAngle], [RPSDiff]]) #camera angle eventually
+        return np.matrix([[ultrasonicAngle], [rightUltrasonicAngle], [RPSDiff]]) #camera angle eventually
 
     def determineSpeedInput(self):
         self.measVector = self.getMeasurements()
