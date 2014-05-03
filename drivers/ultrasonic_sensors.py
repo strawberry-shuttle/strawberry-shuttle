@@ -15,10 +15,10 @@ class UltrasonicSensors:
 
         self.frontSensor = Ultrasonic_MB(0x70)
         self.backSensor = Ultrasonic_MB(0x71)
-        self.frontLeftSensor = Ultrasonic_KS(0xD0)
-        self.backLeftSensor = Ultrasonic_KS(0xD2)
-        self.frontRightSensor = Ultrasonic_KS(0xD4)
-        self.backRightSensor = Ultrasonic_KS(0xD6)
+        self.frontLeftSensor = Ultrasonic_KS(0x72)
+        self.backLeftSensor = Ultrasonic_KS(0x73)
+        self.frontRightSensor = Ultrasonic_KS(0x74)
+        self.backRightSensor = Ultrasonic_KS(0x75)
 
         self.frontSensor.ping()
         self.backSensor.ping()
