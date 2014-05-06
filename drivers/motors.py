@@ -4,7 +4,7 @@ __author__ = 'Scotty Waggoner'
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
 import mechInfo #constants
-
+import time
 # Standalone usage in Python REPL:
 # from drivers.motors import Motors
 # motors = Motors()
@@ -159,9 +159,16 @@ class Motors:
     def printCurrents(self):
         m1cur, m2cur = self.front_motors.read_currents()
         print "Current Left: ", m1cur/100.0, "A Right: ", m2cur/100.0, "A"
-        #m1cur, m2cur = self.back_motors.read_currents()
-        #print "Current M1: ", m1cur/100.0, "A M2: ", m2cur/100.0, "A"
+        m1cur, m2cur = self.back_motors.read_currents()
+        print "Current M1: ", m1cur/100.0, "A M2: ", m2cur/100.0, "A"
 
     def printEncoders(self):
         left, right = self.readEncoderSpeeds()
         print "Speed Left: ", left, " rev/sec Right: ", right/100.0, " rev/sec"
+
+if __name__ == "__main__":
+    m = Motors()
+    m.front_motors.m1_forward(50)
+    time.sleep(2)
+    m.front_motors.m1_forward(0)
+    

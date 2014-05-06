@@ -5,8 +5,7 @@ import time
 
 
 class PIDControl(object):
-    def __init__(self, setpoint, coefficients, maxSpeed):  #maxSpeed is in rads/sec i think?
-        self.maxDiff = maxSpeed
+    def __init__(self, setpoint, coefficients): 
         self.setpoint = setpoint
         self.lastTime = time.time()
         self.kP, self.kI, self.kD = coefficients

@@ -12,8 +12,8 @@ __author__ = 'Evan Racah, Greg Czerniak '
 #TODO: calculate dt thru timing
 import numpy as np
 import time
-#import .mechInfo
-G =5
+from mechInfo import G
+
 
 # Implements a linear Kalman filter.
 class KalmanFilterLinear(object):
@@ -28,7 +28,7 @@ class KalmanFilterLinear(object):
   def __init__(self, kalmanParameters):
  
 
-    self.A, self.B, self.H, self.current_state_estimate, 
+    self.A, self.B, self.H, self.current_state_estimate, \
     self.current_prob_estimate, self.Q, self.R = kalmanParameters
 
     self.lastTime = time.time()
@@ -43,21 +43,22 @@ class KalmanFilterLinear(object):
     self.A[0,1] = G * self.timeStep #mechInfo.G * self.timeStep
     self.lastTime = self.now
     #---------------------------Prediction step-----------------------------
+    print control_vector.shape
     predicted_state_estimate = self.A * self.current_state_estimate + self.B * control_vector
-    predicted_prob_estimate = (self.A * self.current_prob_estimate) * numpy.transpose(self.A) + self.Q
+    predicted_prob_estimate = (self.A * self.current_prob_estimate) * np.transpose(self.A) + self.Q
 
     #--------------------------Observation step-----------------------------
     innovation = measurement_vector - self.H*predicted_state_estimate
-    innovation_covariance = self.H*predicted_prob_estimate*numpy.transpose(self.H) + self.R
+    innovation_covariance = self.H*predicted_prob_estimate*np.transpose(self.H) + self.R
 
     #-----------------------------Update step-------------------------------
-    kalman_gain = predicted_prob_estimate * numpy.transpose(self.H) * numpy.linalg.inv(innovation_covariance)
+    kalman_gain = predicted_prob_estimate * np.transpose(self.H) * np.linalg.inv(innovation_covariance)
     self.current_state_estimate = predicted_state_estimate + kalman_gain * innovation
 
     # We need the size of the matrix so we can make an identity matrix.
     size = self.current_prob_estimate.shape[0]
     # eye(n) = nxn identity matrix.
-    self.current_prob_estimate = (numpy.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
+    self.current_prob_estimate = (np.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
 def setUpMatrices():
   placeError = 0.001 #humanerror in placing robot straight in field
@@ -69,9 +70,12 @@ def setUpMatrices():
 
   A = np.matrix([[1, G *dt],[0, 0]])
   B = np.matrix([[0],[1]])
-  H = np.matrix([[1, 0],[1,0],[1, 0],[1,0],[0,1],[0,1]]) # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]]) 
+  # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],
+  #[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]]) 
+  H = np.matrix([[1, 0],[1,0],[1, 0],[1,0],[0,1],[0,1]]) 
   x = np.matrix([[0],[0]])  #[theta, wdiff] 
   P = np.matrix([[placeError, 0],[0, motorSpinError]]) 
+  #TODO fix q and r
   Q = np.matrix([[processNoise,0],[0, processNoise]]) #process noise
   R = np.matrix([[measNoise,0],[0,measNoise]]) 
 

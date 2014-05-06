@@ -59,7 +59,7 @@ class Control:
         #cameraAngle =
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
         #TODO: add speedDiffBack to matrix also and camera angle
-        return np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]]) #camera angle eventually
+        return np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],[backEncoderAngle], [frontEncoderAngle], [speedDiffFront], [speedDiffBack]]) #camera angle eventually
 
     def determineSpeedInput(self):
         self.measVector = self.getMeasurements()
