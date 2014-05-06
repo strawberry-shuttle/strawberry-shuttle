@@ -81,7 +81,7 @@ class Control:
             #TODO: Get information from cameras
             self.buttons.updateButtonStates() #TODO: Testing button states
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
-            if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped but wait nobtn is 0??
+            if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else: #TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:
