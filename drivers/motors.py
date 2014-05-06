@@ -1,3 +1,4 @@
+#TODO: Test readEncoderDistanceTraveled
 from __future__ import division
 from misc import mechInfo
 

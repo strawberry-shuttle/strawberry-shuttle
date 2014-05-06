@@ -18,6 +18,6 @@ class Log:
         del self.func_prev
         del self.func
         return
-    def ShowDebug(self,message):
+    def ShowDebug(self,message): #E.g. ShowDebug("function_name: message")
         print '[%s -> %s] %s' % (self.module_prev.__name__,self.module.__name__,message)
         return
