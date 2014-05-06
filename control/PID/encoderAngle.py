@@ -3,8 +3,9 @@
 #from encoders
 from __future__ import division
 import time
+
 from drivers.motors import Motors
-import mechInfo
+from misc import mechInfo
 
 
 class EncoderProtractor:

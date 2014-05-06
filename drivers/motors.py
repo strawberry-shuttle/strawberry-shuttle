@@ -1,9 +1,10 @@
 from __future__ import division
+from misc import mechInfo
+
 __author__ = 'Scotty Waggoner'
 
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
-import mechInfo #constants
 import time
 # Standalone usage in Python REPL:
 # from drivers.motors import Motors

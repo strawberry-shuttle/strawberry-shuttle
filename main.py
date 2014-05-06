@@ -7,7 +7,6 @@ from drivers.buttons import Buttons
 from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from kalman.kalman import KalmanFilterLinear, setUpMatrices
-import mechInfo #constants
 # TODO: Update constants in mechInfo
 import numpy as np
 
