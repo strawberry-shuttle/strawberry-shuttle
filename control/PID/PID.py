@@ -1,8 +1,5 @@
-'''
+__author__ = 'Evan Racah'
 
-
-@author: Evan Racah
-'''
 
 import time
 
@@ -19,26 +16,28 @@ class PIDControl(object):
         #self.min_error = -180
 
     def update(self, measurement):
+        #update time stuff
         self.now = time.time()
         self.timeInterval = self.now - self.lastTime
-        self._calcErrorTerms(measurement)
-        input = self._calcInput()
-        self.lastTime = self.now
-        self.previousError = self.error
-        return input
 
-    def set_set_point(self, setpoint):
-        self.setpoint = setpoint
-
-    def _calcErrorTerms(self, measurement):
+        #calculate the three error terms
         self.error = self.setpoint - measurement
         self.errorTotal += self.error * self.timeInterval
         self.dError = (self.error - self.previousError) / self.timeInterval
 
-    def _calcInput(self):
-        self.P = self.kP * self.error
-        self.I = self.kI * self.errorTotal * self.timeInterval
-        self.D = self.kD * (self.dError / self.timeInterval)
-        return self.P + self.I + self.D
+        #multiply by coefficents
+        P = self.kP * self.error
+        I = self.kI * self.errorTotal
+        D = self.kD * self.dError
+        
+        #update time and error stuff
+        self.lastTime = self.now
+        self.previousError = self.error
+
+        return P + I + D
+
+    def set_set_point(self, setpoint):
+        self.setpoint = setpoint
+
 
  
