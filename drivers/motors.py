@@ -30,8 +30,8 @@ class Motors:
         self.d = int(0.25 * 65536)
         self.front_motors.set_m1_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
         self.front_motors.set_m2_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
-        #self.back_motors.set_m1_pidq(self.p, self.i, self.d, self.maxSpeed)
-        #self.back_motors.set_m2_pidq(self.p, self.i, self.d, self.maxSpeed)
+        self.back_motors.set_m1_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
+        self.back_motors.set_m2_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
 
         self.encoderRevLeftFront = 0
         self.encoderRevRightFront = 0
@@ -50,14 +50,14 @@ class Motors:
     def stop(self):  # Stop with deceleration
         self.front_motors.set_m1_speed_accel(self.acceleration, 0)
         self.front_motors.set_m2_speed_accel(self.acceleration, 0)
-        #self.back_motors.set_m1_speed_accel(self.acceleration, 0)
-        #self.back_motors.set_m2_speed_accel(self.acceleration, 0)
+        self.back_motors.set_m1_speed_accel(self.acceleration, 0)
+        self.back_motors.set_m2_speed_accel(self.acceleration, 0)
 
     def estop(self):  # Stop instantly
         self.front_motors.m1_forward(0)
         self.front_motors.m2_forward(0)
-        #self.back_motors.m1_forward(0)
-        #self.back_motors.m2_forward(0)
+        self.back_motors.m1_forward(0)
+        self.back_motors.m2_forward(0)
 
     def moveForward(self, left, right):
         left = self.revToPulses(abs(left))
@@ -72,8 +72,8 @@ class Motors:
         right = self.revToPulses(-abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
         self.front_motors.set_m2_speed_accel(self.acceleration, right)
-        #self.back_motors.set_m1_speed_accel(self.acceleration, left)
-        #self.back_motors.set_m2_speed_accel(self.acceleration, right)
+        self.back_motors.set_m1_speed_accel(self.acceleration, left)
+        self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def readEncoderSpeeds(self):
         #Read speeds in pulses per 125th of a second
