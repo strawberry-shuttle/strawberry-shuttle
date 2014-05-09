@@ -14,7 +14,7 @@ import time
 
 class Motors:
 
-    def __init__(self):
+    def __init__(self,acceleration=2200):
         UART.setup("UART1")
         self.backAngle = 0
         self.frontAngle = 0
@@ -23,7 +23,7 @@ class Motors:
 
         self.encoderResolution = 1024
         self.maxPulsesPerSecond = mechInfo.maxPPS  # Units of pulses per second. 100% of power is given at this encoder reading
-        self.acceleration = 2200  # pulses per second per second
+        self.acceleration = acceleration  # pulses per second per second, default to 2200
 
         self.p = int(1.0 * 65536)
         self.i = int(0.5 * 65536)
@@ -64,8 +64,8 @@ class Motors:
         right = self.revToPulses(abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
         self.front_motors.set_m2_speed_accel(self.acceleration, right)
-        #self.back_motors.set_m1_speed_accel(self.acceleration, left)
-        #self.back_motors.set_m2_speed_accel(self.acceleration, right)
+        self.back_motors.set_m1_speed_accel(self.acceleration, left)
+        self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def moveBackward(self, left, right):
         left = self.revToPulses(-abs(left))
