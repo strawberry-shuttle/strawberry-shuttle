@@ -1,0 +1,11 @@
+#Place in /lib/systemd/system/
+
+[Unit]
+Description=Motor Test
+
+[Service]
+ExecStart=/home/root/hva-prototype/motor_test.py
+SyslogIdentifier=motor_test
+
+[Install]
+WantedBy=multi-user.target

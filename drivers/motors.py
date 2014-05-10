@@ -14,7 +14,7 @@ import time
 
 class Motors:
 
-    def __init__(self,acceleration=2200):
+    def __init__(self, acceleration=2200):
         UART.setup("UART1")
         self.backAngle = 0
         self.frontAngle = 0
