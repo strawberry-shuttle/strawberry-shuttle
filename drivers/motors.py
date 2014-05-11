@@ -1,5 +1,4 @@
-#TODO: Test readEncoderDistanceTraveled overflow and underflow
-#TODO: Test Angle calculation and speed diff
+#TODO: Test Angle calculation - values seemed really small and I'm not sure how changes in directions will be handled. Also when should the angle get reset if ever? Do we NEED the cumulative angle?
 from __future__ import division
 from misc import mechInfo
 
@@ -18,8 +17,7 @@ class Motors:
     def __init__(self, acceleration=1):
         UART.setup("UART1")
         UART.setup("UART2")
-        self.backAngle = 0
-        self.frontAngle = 0
+
         self.front_motors = Roboclaw(0x80, "/dev/ttyO1")
         self.back_motors = Roboclaw(0x81, "/dev/ttyO2")
 
@@ -39,6 +37,9 @@ class Motors:
         self.encoderPulsesFrontRight = 0
         self.encoderPulsesBackLeft = 0
         self.encoderPulsesBackRight = 0
+
+        self.frontAngle = 0
+        self.backAngle = 0
 
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 
@@ -141,17 +142,16 @@ class Motors:
     def readEncoderDistanceTraveled(self):
         return map(self.__pulsesToRev, self.__readEncoderDistanceTraveledPulses())  # Returns values in number of revolutions
 
-    def getDiffAngle(self, encLeftDiff, encRightDiff, angle):
+    def getDiffAngle(self, encLeftDiff, encRightDiff):
         d1 = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
         d2 = encRightDiff * (mechInfo.wheelCircumference / self.encoderResolution)
-        angle += ((d1 - d2) / mechInfo.robotWidth)
-        return angle
+        return (d1 - d2) / mechInfo.robotWidth
 
     def getEncoderAngles(self):
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
-        self.backAngle = self.getDiffAngle(leftFrontDiff, rightFrontDiff, self.frontAngle)
-        self.frontAngle = self.getDiffAngle(leftBackDiff, rightBackDiff, self.backAngle)
-        return [self.backAngle, self.frontAngle]
+        self.frontAngle += self.getDiffAngle(leftFrontDiff, rightFrontDiff)
+        self.backAngle += self.getDiffAngle(leftBackDiff, rightBackDiff)
+        return [self.frontAngle, self.backAngle]
 
     def getSpeedDiff(self):
         leftFront, rightFront, leftBack, rightBack = self.readEncoderSpeeds()
