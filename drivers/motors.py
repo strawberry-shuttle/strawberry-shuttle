@@ -168,6 +168,20 @@ class Motors:
         print "Front Speeds - Left: ", frontLeft, " rev/sec Right: ", frontRight, " rev/sec"
         print "Back  Speeds - Left: ", backLeft, " rev/sec Right: ", backRight, " rev/sec"
 
+    def printBatteryInfo(self):
+        frontBatteryVoltage = self.front_motors.read_main_battery() / 10
+        backBatteryVoltage = self.back_motors.read_main_battery() / 10
+        print "Front Voltage Reading:", frontBatteryVoltage, "V"
+        print "Back  Voltage Reading:", backBatteryVoltage, "V"
+
+        print
+
+        frontBatterySettings = self.front_motors.read_main_battery_settings()
+        backBatterySettings = self.back_motors.read_main_battery_settings()
+        print "Low Voltage Cutoff - Front:", frontBatterySettings[0] / 10, "V Back:", backBatterySettings[0] / 10, "V"
+        print "High Voltage Cutoff - Front:", frontBatterySettings[1] / 10, "V Back:", backBatterySettings[1] / 10, "V"
+
+
 if __name__ == "__main__":
     m = Motors()
     m.front_motors.m1_forward(50)
