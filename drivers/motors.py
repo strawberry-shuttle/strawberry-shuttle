@@ -2,7 +2,7 @@
 from __future__ import division
 from misc import mechInfo
 
-__author__ = 'Scotty Waggoner'
+__author__ = 'Scotty Waggoner, Evan Racah'
 
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
@@ -143,9 +143,9 @@ class Motors:
         return map(self.__pulsesToRev, self.__readEncoderDistanceTraveledPulses())  # Returns values in number of revolutions
 
     def getDiffAngle(self, encLeftDiff, encRightDiff):
-        d1 = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
-        d2 = encRightDiff * (mechInfo.wheelCircumference / self.encoderResolution)
-        return (d1 - d2) / mechInfo.robotWidth
+        leftDistTravelled = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
+        rightDistTravelled = encRightDiff * (mechInfo.wheelCircumference / self.encoderResolution)
+        return (leftDistTravelled - rightDistTravelled) / mechInfo.robotWidth
 
     def getEncoderAngles(self):
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
