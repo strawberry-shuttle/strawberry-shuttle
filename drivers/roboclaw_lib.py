@@ -10,10 +10,8 @@ class Roboclaw:
         self.port = serial.Serial(port, baudrate=38400, timeout=1)
 
     def __send_command(self, command):
-        self.checksum = self.address
-        self.port.write(chr(self.address))
-        self.checksum += command
-        self.port.write(chr(command))
+        self.checksum = self.address + command
+        self.port.write(bytearray([self.address, command]))
         return
 
     def __read_byte(self):
