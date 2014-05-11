@@ -177,7 +177,7 @@ class Roboclaw:
 
     def read_m1_encoder(self):
         self.__send_command(16)
-        enc = self.__read_s_long()
+        enc = self.__read_long()
         status = self.__read_byte()
         if self.__validate_checksum():
             return enc, status

@@ -25,7 +25,7 @@ class Motors:
 
         self.encoderResolution = 1024
         self.maxPulsesPerSecond = mechInfo.maxPPS  # Units of pulses per second. 100% of power is given at this encoder reading
-        self.acceleration = self.revToPulses(acceleration)  # Units of revolutions per second, default = 1
+        self.acceleration = self.__revToPulses(acceleration)  # Units of revolutions per second, default = 1
 
         self.p = int(1.0 * 65536)
         self.i = int(0.5 * 65536)
@@ -35,21 +35,21 @@ class Motors:
         self.back_motors.set_m1_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
         self.back_motors.set_m2_pidq(self.p, self.i, self.d, self.maxPulsesPerSecond)
 
-        self.encoderRevFrontLeft = 0
-        self.encoderRevFrontRight = 0
-        self.encoderRevBackLeft = 0
-        self.encoderRevBackRight = 0
+        self.encoderPulsesFrontLeft = 0
+        self.encoderPulsesFrontRight = 0
+        self.encoderPulsesBackLeft = 0
+        self.encoderPulsesBackRight = 0
 
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 
-    def revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
+    def __revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
         return int(revolutions * self.encoderResolution)
 
-    def pulsesToRev(self, pulses):  # Convert pulses per second to revolutions per second
+    def __pulsesToRev(self, pulses):  # Convert pulses per second to revolutions per second
         return pulses / self.encoderResolution
 
     def maxSpeed(self):
-        return self.pulsesToRev(self.maxPulsesPerSecond)
+        return self.__pulsesToRev(self.maxPulsesPerSecond)
 
     def stop(self):  # Stop with deceleration
         self.front_motors.set_m1_speed_accel(self.acceleration, 0)
@@ -64,22 +64,22 @@ class Motors:
         self.back_motors.m2_forward(0)
 
     def moveForward(self, left, right):
-        left = self.revToPulses(abs(left))
-        right = self.revToPulses(abs(right))
+        left = self.__revToPulses(abs(left))
+        right = self.__revToPulses(abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
         self.front_motors.set_m2_speed_accel(self.acceleration, right)
         self.back_motors.set_m1_speed_accel(self.acceleration, left)
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def moveBackward(self, left, right):
-        left = self.revToPulses(-abs(left))
-        right = self.revToPulses(-abs(right))
+        left = self.__revToPulses(-abs(left))
+        right = self.__revToPulses(-abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
         self.front_motors.set_m2_speed_accel(self.acceleration, right)
         self.back_motors.set_m1_speed_accel(self.acceleration, left)
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
-    def readEncoderSpeedsPPS(self):
+    def __readEncoderSpeedsPPS(self):
         #Read speeds in pulses per second
         leftFront = self.front_motors.read_m1_speed()[0]
         rightFront = self.front_motors.read_m2_speed()[0]
@@ -90,9 +90,9 @@ class Motors:
 
     def readEncoderSpeeds(self):
         #Read speeds in pulses per second
-        return map(self.pulsesToRev, self.readEncoderSpeedsPPS())  # Returns values in revolutions per second
+        return map(self.__pulsesToRev, self.__readEncoderSpeedsPPS())  # Returns values in revolutions per second
 
-    def readEncoderDistanceTraveled(self):
+    def __readEncoderDistanceTraveledPulses(self):
         underflowConst = 0b00000001
         overflowConst = 0b00000100
         maxCount = 4294967295
@@ -105,44 +105,41 @@ class Motors:
 
         #Adjust for underflow and overflow
         if frontLeftStatus & underflowConst:
-            self.encoderRevFrontLeft += maxCount
+            self.encoderPulsesFrontLeft += maxCount
         elif frontLeftStatus & overflowConst:
-            self.encoderRevFrontLeft -= maxCount
+            self.encoderPulsesFrontLeft -= maxCount
 
         if frontRightStatus & underflowConst:
-            self.encoderRevFrontRight += maxCount
+            self.encoderPulsesFrontRight += maxCount
         elif frontRightStatus & overflowConst:
-            self.encoderRevFrontRight -= maxCount
+            self.encoderPulsesFrontRight -= maxCount
 
         if backLeftStatus & underflowConst:
-            self.encoderRevBackLeft += maxCount
+            self.encoderPulsesBackLeft += maxCount
         elif backLeftStatus & overflowConst:
-            self.encoderRevBackLeft -= maxCount
+            self.encoderPulsesBackLeft -= maxCount
 
         if backRightStatus & underflowConst:
-            self.encoderRevBackRight += maxCount
+            self.encoderPulsesBackRight += maxCount
         elif backRightStatus & overflowConst:
-            self.encoderRevBackRight -= maxCount
-
-        #Convert pulses to revolutions
-        frontLeft = self.pulsesToRev(frontLeft)
-        frontRight = self.pulsesToRev(frontRight)
-        backLeft = self.pulsesToRev(backLeft)
-        backRight = self.pulsesToRev(backRight)
+            self.encoderPulsesBackRight -= maxCount
 
         #Find difference in revolutions since last time function was called
-        frontLeftDiff = frontLeft - self.encoderRevFrontLeft
-        frontRightDiff = frontRight - self.encoderRevFrontRight
-        backLeftDiff = backLeft - self.encoderRevBackLeft
-        backRightDiff = backRight - self.encoderRevBackRight
+        frontLeftDiff = abs(frontLeft - self.encoderPulsesFrontLeft)
+        frontRightDiff = abs(frontRight - self.encoderPulsesFrontRight)
+        backLeftDiff = abs(backLeft - self.encoderPulsesBackLeft)
+        backRightDiff = abs(backRight - self.encoderPulsesBackRight)
 
         #Save current revolutions
-        self.encoderRevFrontLeft = frontLeft
-        self.encoderRevFrontRight = frontRight
-        self.encoderRevBackLeft = backLeft
-        self.encoderRevBackRight = backRight
+        self.encoderPulsesFrontLeft = frontLeft
+        self.encoderPulsesFrontRight = frontRight
+        self.encoderPulsesBackLeft = backLeft
+        self.encoderPulsesBackRight = backRight
 
-        return frontLeftDiff, frontRightDiff, backLeftDiff, backRightDiff  # Returns values in revolutions
+        return frontLeftDiff, frontRightDiff, backLeftDiff, backRightDiff  # Returns values in number of pulses
+
+    def readEncoderDistanceTraveled(self):
+        return map(self.__pulsesToRev, self.__readEncoderDistanceTraveledPulses())  # Returns values in number of revolutions
 
     def getDiffAngle(self, encLeftDiff, encRightDiff, angle):
         d1 = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
