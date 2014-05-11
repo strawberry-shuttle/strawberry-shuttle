@@ -12,7 +12,7 @@ __author__ = 'Evan Racah, Greg Czerniak '
 #TODO: calculate dt thru timing
 import numpy as np
 import time
-from mechInfo import G
+from misc.mechInfo import G
 
 
 # Implements a linear Kalman filter.

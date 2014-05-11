@@ -1,10 +1,12 @@
+#TODO: Test
 from __future__ import division
+from misc import mechInfo
+
 __author__ = 'Scotty Waggoner'
 
 from drivers.maxbotix import Ultrasonic_MB
 from drivers.ks import Ultrasonic_KS
 import math
-import mechInfo
 
 
 class UltrasonicSensors:
@@ -96,8 +98,8 @@ class UltrasonicSensors:
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def calculateAngle(self, state):  # TODO: should give a different angle based on if we are moving forward or backward
-        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/mechInfo.distBetweenUS),
-                math.asin((self.frontRightDistance-self.backRightDistance)/mechInfo.distBetweenUS)]
+        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/ mechInfo.distBetweenUS),
+                math.asin((self.frontRightDistance-self.backRightDistance)/ mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow

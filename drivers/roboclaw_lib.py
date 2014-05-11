@@ -10,10 +10,8 @@ class Roboclaw:
         self.port = serial.Serial(port, baudrate=38400, timeout=1)
 
     def __send_command(self, command):
-        self.checksum = self.address
-        self.port.write(chr(self.address))
-        self.checksum += command
-        self.port.write(chr(command))
+        self.checksum = self.address + command
+        self.port.write(bytearray([self.address, command]))
         return
 
     def __read_byte(self):
@@ -179,7 +177,7 @@ class Roboclaw:
 
     def read_m1_encoder(self):
         self.__send_command(16)
-        enc = self.__read_s_long()
+        enc = self.__read_long()
         status = self.__read_byte()
         if self.__validate_checksum():
             return enc, status
