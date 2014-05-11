@@ -1,4 +1,5 @@
-#TODO: Test readEncoderDistanceTraveled
+#TODO: Test readEncoderDistanceTraveled overflow and underflow
+#TODO: Test Angle calculation and speed diff
 from __future__ import division
 from misc import mechInfo
 
@@ -7,14 +8,14 @@ __author__ = 'Scotty Waggoner'
 from drivers.roboclaw_lib import Roboclaw
 import Adafruit_BBIO.UART as UART
 import time
+
 # Standalone usage in Python REPL:
-# from drivers.motors import Motors
-# motors = Motors()
+# from drivers.motors import Motors; m = Motors()
 
 
 class Motors:
 
-    def __init__(self, acceleration=2200):
+    def __init__(self, acceleration=1):
         UART.setup("UART1")
         UART.setup("UART2")
         self.backAngle = 0
@@ -24,7 +25,7 @@ class Motors:
 
         self.encoderResolution = 1024
         self.maxPulsesPerSecond = mechInfo.maxPPS  # Units of pulses per second. 100% of power is given at this encoder reading
-        self.acceleration = acceleration  # pulses per second per second, default to 2200
+        self.acceleration = self.revToPulses(acceleration)  # Units of revolutions per second, default = 1
 
         self.p = int(1.0 * 65536)
         self.i = int(0.5 * 65536)
@@ -78,19 +79,18 @@ class Motors:
         self.back_motors.set_m1_speed_accel(self.acceleration, left)
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
-    def readEncoderSpeeds(self):
-        #Read speeds in pulses per 125th of a second
-        leftFront = self.front_motors.read_m1_inst_speed()[0]
-        rightFront = self.front_motors.read_m2_inst_speed()[0]
-        leftBack = self.back_motors.read_m1_inst_speed()[0]
-        rightBack = self.back_motors.read_m2_inst_speed()[0]
+    def readEncoderSpeedsPPS(self):
+        #Read speeds in pulses per second
+        leftFront = self.front_motors.read_m1_speed()[0]
+        rightFront = self.front_motors.read_m2_speed()[0]
+        leftBack = self.back_motors.read_m1_speed()[0]
+        rightBack = self.back_motors.read_m2_speed()[0]
 
-        #Convert pulses per 125th of a second to revolutions per second
-        leftFront = self.pulsesToRev(leftFront * 125)
-        rightFront = self.pulsesToRev(rightFront * 125)
-        leftBack = self.pulsesToRev(leftBack * 125)
-        rightBack = self.pulsesToRev(rightBack * 125)
-        return leftFront, rightFront, leftBack, rightBack  # Returns values in revolutions per second
+        return leftFront, rightFront, leftBack, rightBack  # Returns values in pulses per second
+
+    def readEncoderSpeeds(self):
+        #Read speeds in pulses per second
+        return map(self.pulsesToRev, self.readEncoderSpeedsPPS())  # Returns values in revolutions per second
 
     def readEncoderDistanceTraveled(self):
         underflowConst = 0b00000001
