@@ -9,4 +9,5 @@ desiredSpeed = 100  # rps, desiredSpeed in rps
 distBetweenUS = 20  # cm
 maxPPS = 4600  # encoder reading at max speed (pulses per second)
 distForNoFurrow = 50  # cm, distances greater than this are assumed to be at the end of the furrow
-G = (wheelDiameter / 2) / robotWidth # G is theta dot Over wheel speed diff relation
+
+G = (wheelDiameter / 2) / robotWidth # G we need to experimentally determine (it is theta dot over omega diff desired)
