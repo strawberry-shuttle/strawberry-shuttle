@@ -23,8 +23,8 @@ class UltrasonicSensors:
 
         self.__pingAll()
 
-        self.frontDistance = 0
-        self.backDistance = 0
+        self.frontDistance = self.distanceStartDecelerating + 10  # For testing when front US isn't hooked up. Forces speed scaling value to 1
+        self.backDistance = self.distanceStartDecelerating + 10  # For testing when rear US isn't hooked up. Forces speed scaling value to 1
         self.frontLeftDistance = 0
         self.backLeftDistance = 0
         self.frontRightDistance = 0
@@ -87,8 +87,8 @@ class UltrasonicSensors:
     def updateDistances(self):
         self.__readFrontLeft()
         self.__readBackRight()
-        self.__readFront()
-        self.__readBack()
+        #self.__readFront()
+        #self.__readBack()
         self.__readBackLeft()
         self.__readFrontRight()
 
@@ -99,11 +99,16 @@ class UltrasonicSensors:
     def getSpeedScalingFront(self):  # TODO: Test
         if self.frontDistance <= self.distanceStop:
             return 0
-        return (self.frontDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
+        elif self.frontDistance >= self.distanceStartDecelerating:
+            return 1
+        else:
+            return (self.frontDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def getSpeedScalingBack(self):  # TODO: Test
         if self.backDistance <= self.distanceStop:
             return 0
+        elif self.backDistance >= self.distanceStartDecelerating:
+            return 1
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def calculateAngle(self):  # TODO: should give a different angle based on if we are moving forward or backward

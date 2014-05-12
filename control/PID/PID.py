@@ -5,8 +5,8 @@ import time
 
 
 class PIDControl(object):
-    def __init__(self, setpoint, coefficients): 
-        self.setpoint = setpoint
+    def __init__(self, setPoint, coefficients):
+        self.setPoint = setPoint
         self.lastTime = time.time()
         self.kP, self.kI, self.kD = coefficients
         self.errorTotal = 0.0
@@ -16,27 +16,27 @@ class PIDControl(object):
 
     def update(self, measurement):
         #update time stuff
-        self.now = time.time()
-        self.timeInterval = self.now - self.lastTime
+        now = time.time()
+        timeInterval = now - self.lastTime
 
         #calculate the three error terms
-        self.error = self.setpoint - measurement
-        self.errorTotal += self.error * self.timeInterval
-        self.dError = (self.error - self.previousError) / self.timeInterval
+        error = self.setPoint - measurement
+        self.errorTotal += error * timeInterval
+        dError = (error - self.previousError) / timeInterval
 
         #multiply by coefficents
-        P = self.kP * self.error
+        P = self.kP * error
         I = self.kI * self.errorTotal
-        D = self.kD * self.dError
+        D = self.kD * dError
         
         #update time and error stuff
-        self.lastTime = self.now
-        self.previousError = self.error
+        self.lastTime = now
+        self.previousError = error
 
         return P + I + D
 
-    def set_set_point(self, setpoint):
-        self.setpoint = setpoint
+    def set_set_point(self, setPoint):
+        self.setPoint = setPoint
 
 
  

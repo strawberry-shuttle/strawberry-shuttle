@@ -18,7 +18,7 @@ class State(Enum):
 class StateManager:
     def __init__(self):
         self.currentState = State.moveForward
-        #self.current = State.canceled
+        #self.currentState = State.canceled
 
     def getCurrentState(self):
         return self.currentState

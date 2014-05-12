@@ -8,6 +8,7 @@ from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from control.kalman.kalman import KalmanFilterLinear
 # TODO: Update constants in mechInfo
+from misc import mechInfo
 import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
@@ -40,16 +41,19 @@ class Control:
         self.stateManager = StateManager()
         self.buttons = Buttons()
         self.encoderProtractor = EncoderProtractor()
-        self.PID = PIDControl(0, [1, 0, 0])  # update these values
+        self.PID = PIDControl(0, (1, 0, 0))  # update these values
         self.kalman = KalmanFilterLinear(KalmanFilterLinear.setUpMatrices())
         self.commandedRPSDiff = 0
-        self.desiredSpeed = self.motors.maxSpeed() * 0.9  # scaled by a (currently arbitrary) percent of max speed
+        self.desiredSpeed = mechInfo.desiredSpeed
 
     def obstacleSpeedScaling(self):
         if self.stateManager.currentState == State.moveForward:
             return self.ultrasonicSensors.getSpeedScalingFront()
         elif self.stateManager.currentState == State.moveBackward:
             return self.ultrasonicSensors.getSpeedScalingBack()
+        else:
+            print "Weird state in obstacleSpeedScaling:", self.stateManager.currentState
+            return 0
 
     def getMeasurements(self):
         self.ultrasonicSensors.updateDistances()
@@ -61,11 +65,11 @@ class Control:
         return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle], [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
-        self.measVector = self.getMeasurements()
-        self.controlVector = np.matrix([[self.commandedRPSDiff]])
-        self.kalman.Step(self.controlVector, self.measVector)
-        self.curAngle = self.kalman.GetCurrentState()
-        return self.PID.update(self.curAngle)
+        measVector = self.getMeasurements()
+        controlVector = np.matrix([[self.commandedRPSDiff]])
+        #self.kalman.Step(controlVector, measVector)
+        curAngle = 0  # curAngle = self.kalman.GetCurrentState()
+        return self.PID.update(curAngle)
 
     def moveInFurrow(self):
         scaledSpeed = self.desiredSpeed * self.obstacleSpeedScaling()  # slow robot if obstacle detected
