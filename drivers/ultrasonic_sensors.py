@@ -1,4 +1,3 @@
-#TODO: Test
 from __future__ import division
 from misc import mechInfo
 
@@ -97,12 +96,12 @@ class UltrasonicSensors:
 
         return self.frontDistance, self.backDistance, self.frontLeftDistance, self.frontRightDistance, self.backLeftDistance, self.backRightDistance
 
-    def getSpeedScalingFront(self):
+    def getSpeedScalingFront(self):  # TODO: Test
         if self.frontDistance <= self.distanceStop:
             return 0
         return (self.frontDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def getSpeedScalingBack(self):
+    def getSpeedScalingBack(self):  # TODO: Test
         if self.backDistance <= self.distanceStop:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
@@ -111,7 +110,7 @@ class UltrasonicSensors:
         return [math.atan((self.frontLeftDistance - self.backLeftDistance) / mechInfo.distBetweenUS),
                 math.atan((self.frontRightDistance - self.backRightDistance) / mechInfo.distBetweenUS)]
 
-    def endOfFurrow(self):
+    def endOfFurrow(self):  # TODO: Test
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow
         if self.frontLeftDistance > distEOF and self.frontRightDistance > distEOF or self.backLeftDistance > distEOF and self.backRightDistance > distEOF:
             return True

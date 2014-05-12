@@ -1,4 +1,3 @@
-#TODO: Test Angle calculation - values seemed really small and I'm not sure how changes in directions will be handled. Also when should the angle get reset if ever? Do we NEED the cumulative angle?
 from __future__ import division
 from misc import mechInfo
 
