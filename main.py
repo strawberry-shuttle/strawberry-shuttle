@@ -6,7 +6,7 @@ from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
 from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
-from kalman.kalman import KalmanFilterLinear, setUpMatrices
+from kalman.kalman import KalmanFilterLinear
 # TODO: Update constants in mechInfo
 import numpy as np
 
@@ -40,8 +40,8 @@ class Control:
         self.stateManager = StateManager()
         self.buttons = Buttons()
         self.encoderProtractor = EncoderProtractor()
-        self.PID = PIDControl(0, [1, 0, 0], 100)  # update these values
-        self.kalman = KalmanFilterLinear(setUpMatrices())
+        self.PID = PIDControl(0, [1, 0, 0])  # update these values
+        self.kalman = KalmanFilterLinear(KalmanFilterLinear.setUpMatrices())
         self.commandedRPSDiff = 0
         self.desiredSpeed = self.motors.maxSpeed() * 0.9  # scaled by a (currently arbitrary) percent of max speed
 
@@ -58,7 +58,7 @@ class Control:
         #cameraAngle =
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
         #TODO: add speedDiffBack to matrix also and camera angle
-        return np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],[backEncoderAngle], [frontEncoderAngle], [speedDiffFront], [speedDiffBack]]) #camera angle eventually
+        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle], [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
         self.measVector = self.getMeasurements()
@@ -83,7 +83,7 @@ class Control:
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
             if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
-            else: #TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
+            else:  # TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:
                     self.motors.stop()
                 elif self.stateManager.currentState & State.estop:
