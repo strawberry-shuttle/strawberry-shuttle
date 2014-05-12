@@ -2,34 +2,34 @@
 
 from drivers.motors import Motors
 from time import sleep, time
-import mechInfo
+from misc import mechInfo
 import Adafruit_BBIO.GPIO as GPIO
 
-distance = 1828.0 #distance to travel in cm, ~20 yards
-rps = 1.0 #Velocity
+distance = 1828.0  # distance to travel in cm, ~20 yards
+rps = 0.75  # Velocity
 
 rotations = distance/mechInfo.wheelCircumference
 t = rotations/rps
 
 GPIO.setup("P8_9", GPIO.IN)   # Forward Button
 
-m = Motors(2200)
+m = Motors(1)
 
 while 1:
     while GPIO.input("P8_9"):
         pass
 
-    m.moveForward(rps,rps)
+    m.moveForward(rps, rps)
     
     sleep(2)
 
-    currenttime = time()
-    finaltime = currenttime + t
+    currentTime = time()
+    finalTime = currentTime + t
     
 
-    while GPIO.input("P8_9") and finaltime-currenttime > 0:
-        currenttime = time()
+    while GPIO.input("P8_9") and finalTime-currentTime > 0:
+        currentTime = time()
 
-    m.moveForward(0,0)
+    m.moveForward(0, 0)
     sleep(3)
 
