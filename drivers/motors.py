@@ -142,15 +142,16 @@ class Motors:
     def readEncoderDistanceTraveled(self):
         return map(self.__pulsesToRev, self.__readEncoderDistanceTraveledPulses())  # Returns values in number of revolutions
 
-    def getDiffAngle(self, encLeftDiff, encRightDiff):
-        leftDistTravelled = encLeftDiff * (mechInfo.wheelCircumference / self.encoderResolution)
-        rightDistTravelled = encRightDiff * (mechInfo.wheelCircumference / self.encoderResolution)
+    @staticmethod
+    def __getDiffAngle(encLeftDiff, encRightDiff):
+        leftDistTravelled = encLeftDiff * mechInfo.wheelCircumference
+        rightDistTravelled = encRightDiff * mechInfo.wheelCircumference
         return (leftDistTravelled - rightDistTravelled) / mechInfo.robotWidth
 
     def getEncoderAngles(self):
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
-        self.frontAngle += self.getDiffAngle(leftFrontDiff, rightFrontDiff)
-        self.backAngle += self.getDiffAngle(leftBackDiff, rightBackDiff)
+        self.frontAngle += self.__getDiffAngle(leftFrontDiff, rightFrontDiff)
+        self.backAngle += self.__getDiffAngle(leftBackDiff, rightBackDiff)
         return [self.frontAngle, self.backAngle]
 
     def getSpeedDiff(self):
