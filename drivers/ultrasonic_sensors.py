@@ -17,17 +17,12 @@ class UltrasonicSensors:
 
         self.frontSensor = Ultrasonic_MB(0x70)
         self.backSensor = Ultrasonic_MB(0x71)
-        self.frontLeftSensor = Ultrasonic_KS(0x72)
-        self.backLeftSensor = Ultrasonic_KS(0x73)
-        self.frontRightSensor = Ultrasonic_KS(0x74)
-        self.backRightSensor = Ultrasonic_KS(0x75)
+        self.frontLeftSensor = Ultrasonic_KS(0xD0)
+        self.frontRightSensor = Ultrasonic_KS(0xD2)
+        self.backLeftSensor = Ultrasonic_KS(0xD4)
+        self.backRightSensor = Ultrasonic_KS(0xD6)
 
-        self.frontSensor.ping()
-        self.backSensor.ping()
-        self.frontLeftSensor.ping()
-        self.backLeftSensor.ping()
-        self.frontRightSensor.ping()
-        self.backRightSensor.ping()
+        self.__pingAll()
 
         self.frontDistance = 0
         self.backDistance = 0
@@ -36,56 +31,71 @@ class UltrasonicSensors:
         self.frontRightDistance = 0
         self.backRightDistance = 0
 
-    def readFront(self):
+    def disableAllClampdownSCL(self):
+        #Disables the sensors pulling the clock line low during ranging. Allows commands to be sent to other sensors during ranging
+        #self.frontSensor.disableClampdownSCL()
+        #self.backSensor.disableClampdownSCL()
+        self.frontLeftSensor.disableClampdownSCL()
+        self.frontRightSensor.disableClampdownSCL()
+        self.backLeftSensor.disableClampdownSCL()
+        self.backRightSensor.disableClampdownSCL()
+
+    def __pingAll(self):
+        #Attempted to order so pings don't interfere with each other. Not sure if this actually matters
+        self.frontLeftSensor.ping()
+        self.backRightSensor.ping()
+        self.frontSensor.ping()
+        self.backSensor.ping()
+        self.backLeftSensor.ping()
+        self.frontRightSensor.ping()
+
+    def __readFront(self):
         newDistance = self.frontSensor.read()
         if newDistance != -1:
-            self.frontDistance = newDistance
-        self.frontSensor.ping()
+            self.frontDistance = newDistance / 10  # Convert mm to cm
         return self.frontDistance
 
-    def readBack(self):
+    def __readBack(self):
         newDistance = self.backSensor.read()
         if newDistance != -1:
-            self.backDistance = newDistance
-        self.backSensor.ping()
+            self.backDistance = newDistance / 10  # Convert mm to cm
         return self.backDistance
 
-    def readFrontLeft(self):
+    def __readFrontLeft(self):
         newDistance = self.frontLeftSensor.read()
         if newDistance != -1:
-            self.frontLeftDistance = newDistance
-        self.frontLeftSensor.ping()
+            self.frontLeftDistance = newDistance / 10  # Convert mm to cm
         return self.frontLeftDistance
 
-    def readBackLeft(self):
-        newDistance = self.backLeftSensor.read()
-        if newDistance != -1:
-            self.backLeftDistance = newDistance
-        self.backLeftSensor.ping()
-        return self.backLeftDistance
-
-    def readFrontRight(self):
+    def __readFrontRight(self):
         newDistance = self.frontRightSensor.read()
         if newDistance != -1:
-            self.frontRightDistance = newDistance
-        self.frontRightSensor.ping()
+            self.frontRightDistance = newDistance / 10  # Convert mm to cm
         return self.frontRightDistance
 
-    def readBackRight(self):
+    def __readBackLeft(self):
+        newDistance = self.backLeftSensor.read()
+        if newDistance != -1:
+            self.backLeftDistance = newDistance / 10  # Convert mm to cm
+        return self.backLeftDistance
+
+    def __readBackRight(self):
         newDistance = self.backRightSensor.read()
         if newDistance != -1:
-            self.backRightDistance = newDistance
-        self.backRightSensor.ping()
+            self.backRightDistance = newDistance / 10  # Convert mm to cm
         return self.backRightDistance
 
     def updateDistances(self):
-        #Attempted to order so pings don't interfere with each other. Not sure if this actually matters
-        self.readFrontLeft()
-        self.readBackRight()
-        self.readFront()
-        self.readBack()
-        self.readBackLeft()
-        self.readFrontRight()
+        self.__readFrontLeft()
+        self.__readBackRight()
+        self.__readFront()
+        self.__readBack()
+        self.__readBackLeft()
+        self.__readFrontRight()
+
+        self.__pingAll()
+
+        return self.frontDistance, self.backDistance, self.frontLeftDistance, self.frontRightDistance, self.backLeftDistance, self.backRightDistance
 
     def getSpeedScalingFront(self):
         if self.frontDistance <= self.distanceStop:
@@ -97,9 +107,9 @@ class UltrasonicSensors:
             return 0
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
-    def calculateAngle(self, state):  # TODO: should give a different angle based on if we are moving forward or backward
-        return [math.asin((self.frontLeftDistance-self.backLeftDistance)/ mechInfo.distBetweenUS),
-                math.asin((self.frontRightDistance-self.backRightDistance)/ mechInfo.distBetweenUS)]
+    def calculateAngle(self):  # TODO: should give a different angle based on if we are moving forward or backward
+        return [math.asin((self.frontLeftDistance - self.backLeftDistance) / mechInfo.distBetweenUS),
+                math.asin((self.frontRightDistance - self.backRightDistance) / mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow

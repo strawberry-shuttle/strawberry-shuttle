@@ -37,10 +37,10 @@ class Adafruit_I2C:
         except IOError, err:
             return self.errMsg()
 
-    def write8_noreg(self,value):
+    def write8_noreg(self, value):
         "Writes an 8-bit value to the address, assumes device has no registers"
         try:
-            self.bus.write_byte(self.address,value)
+            self.bus.write_byte(self.address, value)
             if self.debug:
                 print "I2C: Wrote 0x%02X to device" % (value)
         except IOError, err:
