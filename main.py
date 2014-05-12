@@ -6,7 +6,7 @@ from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
 from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
-from kalman.kalman import KalmanFilterLinear
+from control.kalman.kalman import KalmanFilterLinear
 # TODO: Update constants in mechInfo
 import numpy as np
 
