@@ -55,11 +55,11 @@ class Control:
 
     def getMeasurements(self):
         self.ultrasonicSensors.updateDistances()
-        leftUltrasonicAngle,rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
+        leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles()
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
-        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle],\
-         [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
+        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle],
+                          [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
         measVector = self.getMeasurements()
@@ -80,7 +80,7 @@ class Control:
     def run(self):  # Main function
         while True:
             #TODO: Get information from cameras
-            self.buttons.updateButtonStates() #TODO: Testing button states
+            self.buttons.updateButtonStates()  # TODO: Testing button states
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
             if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...

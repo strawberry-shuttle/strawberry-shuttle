@@ -57,14 +57,14 @@ class KalmanFilter(object):
         # eye(n) = nxn identity matrix.
         self.current_prob_estimate = (np.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
-    
+    @staticmethod
     def setUpMatrices():
-        placeError = 0.001  # humanerror in placing robot straight in field
+        placeError = 0.001  # human error in placing robot straight in field
         motorSpinError = 0.00001
         processNoise = 0.001
         measNoise = 0.001
-        dt = 0  # we dont know this yet but we will correct it before needed
-        #G = radius_of_wheeel / width of robot
+        dt = 0  # we don't know this yet but we will correct it before needed
+        #G = radius_of_wheel / width of robot
 
         A = np.matrix([[1, G *dt], [0, 0]])
         B = np.matrix([[0], [1]])
@@ -82,4 +82,4 @@ class KalmanFilter(object):
 
 if __name__ == "__main__":
     dt = 0.0001  # we need to calculate this
-    kalman = KalmanFilterLinear()
+    kalman = KalmanFilter()
