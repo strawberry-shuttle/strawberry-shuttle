@@ -1,11 +1,57 @@
-#Strawberry Shuttle Prototype Code
+#Strawberry Shuttle Code
 
-##Processing
-Processing is a tool to graphically display stuff. It can connect with the Arduino to dislay real time data sent over the serial port. I used Processing to graph the distance given by both of the ultrasonic sensors. With it I think we can more easily tell when/where the signal is not stable and see the range that the ultrasonic sensor has.
+Navigation
 
-###Instructions for Using Processing to display the serial output from the Arduino
-1. Download and install both the [Arduino IDE](http://arduino.cc/en/Main/Software) and [Processing](http://www.processing.org/download/?processing)
-2. Download the library for Processing v2.0 from [this](http://playground.arduino.cc/Interfacing/Processing) page
-3. That same page has instructions of how to configure it but basically copy the `arduino` folder from the library zip into the `libraries` sub-folder of your Processing Sketchbook. (You can find the location of your Sketchbook by opening the Processing Preferences. If you haven't made a "libraries" sub-folder, create one.) I had to restart Processing after copying it.
-4. When you run the code in processing `ping_test\two_ultrasonic_sensors_graphing\two_ultrasonic_sensors_graphing.pde` it displayes the serial interfaces in a list and you may have to modify the array index on line 27 (`myPort = new Serial(this, Serial.list()[1], 9600);`) to choose the right one.
-5. Run `ping_test\ping_test.ino` on the Arduino, don't connect with the Serial Monitor, and then run the Processing code and you should see a realtime graph. The red graph is sensor 1 and the blue is sensor 2.
+i.) Main Directory
+
+main.py: Main system control file
+
+encoderAngle_test.py: 
+
+ks_test.py: Test Kingsin Ultrasonic Driver
+
+maxbotix_test.py: Test Maxbotix Ultrasonic Driver
+
+motor_test.py: Service that handles starting and stopping forward movement of robot based on GPIO input or given distance.
+
+sensor_covariance_test.py:
+
+time_resp_motor_test.py 
+
+ii.) camera
+
+->BirdsEyeView: Contains Bird's Eye View related files
+
+iii.) control
+
+->fuzzy: 
+
+->kalman:
+
+->PID:
+
+->state: Contains system state machine code, handles state transitions
+
+iv.) drivers
+
+buttons.py: External button functionality
+
+ultrasonic_sensors.py: Ultrasonic Sensor API, talks to ultrasonic drivers
+
+ks.py: Kingsin Ultrasonic Sensor Driver, don't use directly; handle through ultrasonic_sensors.py
+
+maxbotix.py: Maxbotix Ultrasonic Sensor Driver, don't use directly; handle through ultrasonic_sensors.py
+
+motors.py: Motor API, talks to roboclaw driver
+
+roboclaw_lib.py: Roboclaw Motor Controller driver, don't directly access, use motors.py instead
+
+roboclaw_test.py: Example function for roboclaw_lib
+
+v.) misc
+
+log.py: Logging class, use to print out stack information
+
+mechInfo.py: Contains constants relating to physical specifications
+
+
