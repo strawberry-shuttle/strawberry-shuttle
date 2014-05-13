@@ -16,7 +16,7 @@ from misc.mechInfo import G
 
 
 # Implements a linear Kalman filter.
-class KalmanFilterLinear(object):
+class KalmanFilter(object):
     # I know, I know, VIJAY: you can turn this into a readme if you want, but nice to have now, while working on it
     # A: State transition matrix.
     # B: Control matrix.
@@ -40,10 +40,10 @@ class KalmanFilterLinear(object):
         self.A[0, 1] = G * timeStep  # mechInfo.G * timeStep
         self.lastTime = now
         #---------------------------Prediction step-----------------------------
-        print control_vector.shape
+        
         predicted_state_estimate = self.A * self.current_state_estimate + self.B * control_vector
         predicted_prob_estimate = (self.A * self.current_prob_estimate) * np.transpose(self.A) + self.Q
-
+       
         #--------------------------Observation step-----------------------------
         innovation = measurement_vector - self.H*predicted_state_estimate
         innovation_covariance = self.H*predicted_prob_estimate*np.transpose(self.H) + self.R
@@ -75,7 +75,7 @@ class KalmanFilterLinear(object):
         P = np.matrix([[placeError, 0], [0, motorSpinError]])
         #TODO fix q and r
         Q = np.matrix([[processNoise, 0], [0, processNoise]])  # process noise
-        R = np.matrix([[measNoise, 0], [0, measNoise]])
+        R = np.identity(6)*measNoise
 
         return [A, B, H, x, P, Q, R]
 
