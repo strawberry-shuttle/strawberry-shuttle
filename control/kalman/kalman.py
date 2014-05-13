@@ -25,9 +25,9 @@ class KalmanFilter(object):
     # current_prob_estimate: covariance estimate.
     # Q: Estimated error in process.
     # R: Estimated error in measurements.
-    def __init__(self, kalmanParameters):
+    def __init__(self):
         self.A, self.B, self.H, self.current_state_estimate, \
-            self.current_prob_estimate, self.Q, self.R = kalmanParameters
+            self.current_prob_estimate, self.Q, self.R = self.setUpMatrices()
 
         self.lastTime = time.time()
 
@@ -57,7 +57,7 @@ class KalmanFilter(object):
         # eye(n) = nxn identity matrix.
         self.current_prob_estimate = (np.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
-    @staticmethod
+    
     def setUpMatrices():
         placeError = 0.001  # humanerror in placing robot straight in field
         motorSpinError = 0.00001
@@ -82,4 +82,4 @@ class KalmanFilter(object):
 
 if __name__ == "__main__":
     dt = 0.0001  # we need to calculate this
-    kalman = KalmanFilterLinear(KalmanFilterLinear.setUpMatrices())
+    kalman = KalmanFilterLinear()
