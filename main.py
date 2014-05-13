@@ -4,7 +4,6 @@ from control.state.state import State  # Enum class
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
-from control.PID.encoderAngle import EncoderProtractor
 from control.PID.PID import PIDControl
 from control.kalman.kalman import KalmanFilterLinear
 # TODO: Update constants in mechInfo
@@ -40,7 +39,6 @@ class Control:
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
         self.buttons = Buttons()
-        self.encoderProtractor = EncoderProtractor()
         self.PID = PIDControl(0, (1, 0, 0))  # update these values
         self.kalman = KalmanFilterLinear(KalmanFilterLinear.setUpMatrices())
         self.commandedRPSDiff = 0
