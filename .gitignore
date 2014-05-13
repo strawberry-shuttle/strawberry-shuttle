@@ -4,3 +4,5 @@ natcar-prototype/Debug/
 *.pyc
 *.pyo
 *.DS_STORE
+*.mp4
+*.mov

@@ -78,7 +78,7 @@ void getCorners(IplImage* image, int imageWidth, int imageHeight,CvPoint2D32f do
    }
   
    cvReleaseImage(&orig);
-   return ;
+   return;
    
 }
 
