@@ -112,7 +112,7 @@ int main(int argc, char* argv[])
 	//calibration code here... possibly
 
 	cvNamedWindow("Chessboard");
-    CvPoint2D32f dot = cvPoint2D32f(imageWidth-200.0,imageHeight-200.0);
+    CvPoint2D32f dot = cvPoint2D32f(imageWidth / 2.0,imageHeight / 2.0);
     CvPoint2D32f corners[4] = {dot, dot, dot, dot};
     getCorners(test,imageWidth,imageHeight,corners);
 	
@@ -173,11 +173,12 @@ int main(int argc, char* argv[])
     H,
     CV_INTER_LINEAR | CV_WARP_INVERSE_MAP | CV_WARP_FILL_OUTLIERS
     );
+    cvShowImage("Chessboard", image);
     cvShowImage( "Birds_Eye", birds_image );
 
     key = cvWaitKey();
     if(key == 'u') Z += 0.5;
-    if(key == 'd') Z -= 0.5;
+    if(key == 'j') Z -= 0.5;
     if(key == 'w') boardHeight += 1;
     if(key == 's') boardHeight -=1;
     if(key == 'a') boardWidth -=1;

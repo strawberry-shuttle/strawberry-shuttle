@@ -1,7 +1,7 @@
 #Sensor Covariance Test
 #Evan Racah
 #5/12/14
-__author__ 'Evan Racah'
+__author__ = 'Evan Racah'
 import numpy as np
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
@@ -21,5 +21,6 @@ def test(numMeas):
 		time.delay(0.1)
 		
 	return np.cov(rawData)
+
 
 

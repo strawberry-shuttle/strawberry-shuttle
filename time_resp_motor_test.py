@@ -17,7 +17,7 @@ def takeReadings(t,rps,t0):
 		sleep(delay)
 		return t,rps
 
-def timeResponse(accel,rps,delay,totalTime):
+def timeResponse(accel,speed,delay,totalTime):
 	
 	if(totalTime < 2):
 		print "Hey totalTime must be greater than 2!"
@@ -29,7 +29,8 @@ def timeResponse(accel,rps,delay,totalTime):
 	t0 = time()
 	t = [0]
 	rps = [tuple(motor.readEncoderSpeed())]
-	motor.moveForward(rps,rps)
+	motor.moveForward(speed,speed)
+	
 
 	sleep(delay)
 
