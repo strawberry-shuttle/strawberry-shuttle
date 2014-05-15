@@ -22,5 +22,10 @@ def test(numMeas):
 		
 	return np.cov(rawData)
 
+if __name__=="__main__":
+	covMatrix = test(50)
+	print covMatrix
+
+
 
 
