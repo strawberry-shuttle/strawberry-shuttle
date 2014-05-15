@@ -5,6 +5,7 @@ __author__ = 'Scotty Waggoner'
 
 from drivers.maxbotix import Ultrasonic_MB
 from drivers.ks import Ultrasonic_KS
+from misc.log import Log
 import math
 
 
@@ -117,6 +118,8 @@ class UltrasonicSensors:
 
     def endOfFurrow(self):  # TODO: Test
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow
+        l = Log()
+        l.ShowDebug("Distances: %u %u %u %u" % (self.frontLeftDistance,self.frontRightDistance,self.backLeftDistance,self.backRightDistance))
         if self.frontLeftDistance > distEOF and self.frontRightDistance > distEOF or self.backLeftDistance > distEOF and self.backRightDistance > distEOF:
             return True
         return False

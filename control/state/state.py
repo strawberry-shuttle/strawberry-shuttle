@@ -20,9 +20,6 @@ class StateManager:
         self.currentState = State.moveForward
         #self.currentState = State.canceled
 
-    def getCurrentState(self):
-        return self.currentState
-
     def updateState(self, button_state, end_of_furrow):
         state = self.currentState
         moving = state & State.moving

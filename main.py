@@ -8,6 +8,7 @@ from control.PID.PID import PIDControl
 from control.kalman.kalman import KalmanFilterLinear
 # TODO: Update constants in mechInfo
 from misc import mechInfo
+from misc.log import Log
 import numpy as np
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
@@ -50,8 +51,9 @@ class Control:
         elif self.stateManager.currentState == State.moveBackward:
             return self.ultrasonicSensors.getSpeedScalingBack()
         else:
-            print "Weird state in obstacleSpeedScaling:", self.stateManager.currentState
-            return 0
+            l = Log()
+            l.ShowDebug("Function should not be called in state %d" % self.stateManager.currentState);
+            return 0 #Should never happen, will force stop
 
     def getMeasurements(self):
         self.ultrasonicSensors.updateDistances()
@@ -82,7 +84,7 @@ class Control:
             #TODO: Get information from cameras
             self.buttons.updateButtonStates()  # TODO: Testing button states
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
-            if ~(self.stateManager.currentState & State.stopped):  # Robot not stopped
+            if not (self.stateManager.currentState & State.stopped):  # Robot not stopped
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else:  # TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:
