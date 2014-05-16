@@ -3,17 +3,15 @@ from __future__ import division
 __author__ = 'Evan Racah'
 from drivers.motors import Motors
 from time import sleep, time
-import mechInfo
+import misc.mechInfo
 import random
 import math
 import Adafruit_BBIO.GPIO as GPIO
 
-# def motor_readEncoderSpeed1(t):
-# 	return 4*[2.0-math.exp(-2.0*t[-1])]
 
 def takeReadings(t,rps,t0):
 		t.append(time() - t0)
-		rps.append(tuple(motor.readEncoderSpeed()))
+		rps.append(tuple(motor.readEncoderSpeeds()))
 		sleep(delay)
 		return t,rps
 
@@ -28,7 +26,7 @@ def timeResponse(accel,speed,delay,totalTime):
 
 	t0 = time()
 	t = [0]
-	rps = [tuple(motor.readEncoderSpeed())]
+	rps = [tuple(motor.readEncoderSpeeds())]
 	motor.moveForward(speed,speed)
 	
 
@@ -40,11 +38,10 @@ def timeResponse(accel,speed,delay,totalTime):
 		t,rps = takeReadings(t,rps,t0)
 
 	#now does same thing but checks for button to stop
-	#while GPIO.input("P8_9") and ((t[-1] - t0) < 10):
-	while ((t[-1]) < totalTime):
+	while GPIO.input("P8_9") and ((t[-1] - t0) < 10):
 		t,rps = takeReadings(t,rps,t0)
 
-	m.moveForward(0,0)
+	motor.moveForward(0,0)
 
 	sleep(3)
 
@@ -67,10 +64,10 @@ def timeResponse(accel,speed,delay,totalTime):
 		count += 1
    
 if __name__=="__main__":
-	accel = 2200
+	accel = 1
 	rps = 1.0
-	delay = 0.1
-	totalTime = 1
+	delay = 0.05
+	totalTime = 10
 	motor = Motors(accel)
 	GPIO.setup("P8_9", GPIO.IN) 
 	timeResponse(accel,rps,delay,totalTime)

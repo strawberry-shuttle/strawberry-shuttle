@@ -11,8 +11,8 @@ from time import delay
 def test(numMeas):
 	motors = Motors()
 	ultrasonicSensors = UltrasonicSensors()
-
 	rawData = np.zeros(6,numMeas)
+	motors.forward(1,1)
 	for i in range(numMeas)
 		ultrasonicSensors.updateDistances()
 		rawData[0,i],rawData[1,i] = ultrasonicSensors.calculateAngle() #right and left ultrasonic sensor
