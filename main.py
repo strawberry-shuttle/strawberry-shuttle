@@ -41,7 +41,7 @@ class Control:
         self.stateManager = StateManager()
         self.buttons = Buttons()
         self.PID = PIDControl(0, (1, 0, 0))  # update these values
-        self.kalman = KalmanFilterLinear(KalmanFilterLinear.setUpMatrices())
+        self.kalman = KalmanFilter()
         self.commandedRPSDiff = 0
         self.desiredSpeed = mechInfo.desiredSpeed
 
@@ -66,8 +66,8 @@ class Control:
     def determineSpeedInput(self):
         measVector = self.getMeasurements()
         controlVector = np.matrix([[self.commandedRPSDiff]])
-        #self.kalman.Step(controlVector, measVector)
-        curAngle = 0  # curAngle = self.kalman.GetCurrentState()
+        self.kalman.Step(controlVector, measVector)
+        curAngle = self.kalman.GetCurrentState()
         return self.PID.update(curAngle)
 
     def moveInFurrow(self):

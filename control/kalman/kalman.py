@@ -1,6 +1,6 @@
 from __future__ import division, absolute_import
 
-__author__ = 'Evan Racah, Greg Czerniak '
+__author__ = 'Evan Racah, Greg Czerniak'
 #Kalman Filter 
 #Evan Racah
 #This class was written  by Greg Czerniak with some modifications
