@@ -5,7 +5,7 @@ from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
 from control.PID.PID import PIDControl
-from control.kalman.kalman import KalmanFilterLinear
+from control.kalman.kalman import KalmanFilter
 # TODO: Update constants in mechInfo
 from misc import mechInfo
 from misc.log import Log
@@ -67,7 +67,7 @@ class Control:
         measVector = self.getMeasurements()
         controlVector = np.matrix([[self.commandedRPSDiff]])
         self.kalman.Step(controlVector, measVector)
-        curAngle = self.kalman.GetCurrentState()
+        curAngle = self.kalman.getCurrentAngle()
         return self.PID.update(curAngle)
 
     def moveInFurrow(self):
