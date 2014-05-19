@@ -1,2 +1,2 @@
 all:
-	g++ morphskel.cpp -o morphskel.out  `pkg-config --cflags --libs opencv`
+	g++ morphskel.cpp -o skel.out  `pkg-config --cflags --libs opencv`
