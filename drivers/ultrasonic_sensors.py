@@ -113,7 +113,7 @@ class UltrasonicSensors:
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def calculateAngle(self):  # TODO: should give a different angle based on if we are moving forward or backward
-        return [math.atan((self.frontLeftDistance - self.backLeftDistance) / mechInfo.distBetweenUS),
+        return [-1*math.atan((self.frontLeftDistance - self.backLeftDistance) / mechInfo.distBetweenUS),
                 math.atan((self.frontRightDistance - self.backRightDistance) / mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):  # TODO: Test
