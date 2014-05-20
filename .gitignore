@@ -1,6 +1,6 @@
 natcar-prototype/Debug/
-.out
-.idea
+*.out
+*.idea
 *.pyc
 *.pyo
 *.DS_STORE

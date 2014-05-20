@@ -6,6 +6,7 @@ __author__ = 'Scotty Waggoner'
 from drivers.maxbotix import Ultrasonic_MB
 from drivers.ks import Ultrasonic_KS
 from misc.log import Log
+from misc.median_buffer import MedianBuffer as MB
 import math
 
 
@@ -23,13 +24,13 @@ class UltrasonicSensors:
         self.backRightSensor = Ultrasonic_KS(0xD6)
 
         self.__pingAll()
-
+        #TODO: Change front and back distance to median buffer
         self.frontDistance = self.distanceStartDecelerating + 10  # For testing when front US isn't hooked up. Forces speed scaling value to 1
         self.backDistance = self.distanceStartDecelerating + 10  # For testing when rear US isn't hooked up. Forces speed scaling value to 1
-        self.frontLeftDistance = 0
-        self.backLeftDistance = 0
-        self.frontRightDistance = 0
-        self.backRightDistance = 0
+        self.frontLeftDistance = MB()
+        self.backLeftDistance = MB()
+        self.frontRightDistance = MB()
+        self.backRightDistance = MB()
 
     def disableAllClampdownSCL(self):
         #Disables the sensors pulling the clock line low during ranging. Allows commands to be sent to other sensors during ranging
@@ -64,26 +65,26 @@ class UltrasonicSensors:
     def __readFrontLeft(self):
         newDistance = self.frontLeftSensor.read()
         if newDistance != -1:
-            self.frontLeftDistance = newDistance / 10  # Convert mm to cm
-        return self.frontLeftDistance
+            self.frontLeftDistance.insert(newDistance / 10)  # Convert mm to cm
+        return self.frontLeftDistance.median
 
     def __readFrontRight(self):
         newDistance = self.frontRightSensor.read()
         if newDistance != -1:
-            self.frontRightDistance = newDistance / 10  # Convert mm to cm
-        return self.frontRightDistance
+            self.frontRightDistance.insert(newDistance / 10)  # Convert mm to cm
+        return self.frontRightDistance.median
 
     def __readBackLeft(self):
         newDistance = self.backLeftSensor.read()
         if newDistance != -1:
-            self.backLeftDistance = newDistance / 10  # Convert mm to cm
-        return self.backLeftDistance
+            self.backLeftDistance.insert(newDistance / 10)  # Convert mm to cm
+        return self.backLeftDistance.median
 
     def __readBackRight(self):
         newDistance = self.backRightSensor.read()
         if newDistance != -1:
-            self.backRightDistance = newDistance / 10  # Convert mm to cm
-        return self.backRightDistance
+            self.backRightDistance.insert(newDistance / 10)  # Convert mm to cm
+        return self.backRightDistance.median
 
     def updateDistances(self):
         self.__readFrontLeft()
@@ -113,13 +114,13 @@ class UltrasonicSensors:
         return (self.backDistance - self.distanceStop) / (self.distanceStartDecelerating - self.distanceStop)
 
     def calculateAngle(self):  # TODO: should give a different angle based on if we are moving forward or backward
-        return [math.atan((self.frontLeftDistance - self.backLeftDistance) / mechInfo.distBetweenUS),
-                -1*math.atan((self.frontRightDistance - self.backRightDistance) / mechInfo.distBetweenUS)]
+        return [math.atan((self.frontLeftDistance.median - self.backLeftDistance.median) / mechInfo.distBetweenUS),
+                -1*math.atan((self.frontRightDistance.median - self.backRightDistance.median) / mechInfo.distBetweenUS)]
 
     def endOfFurrow(self):  # TODO: Test
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow
         l = Log()
-        l.ShowDebug("Distances: %u %u %u %u" % (self.frontLeftDistance,self.frontRightDistance,self.backLeftDistance,self.backRightDistance))
-        if self.frontLeftDistance > distEOF and self.frontRightDistance > distEOF or self.backLeftDistance > distEOF and self.backRightDistance > distEOF:
+        l.ShowDebug("Distances: %u %u %u %u" % (self.frontLeftDistance.median,self.frontRightDistance.median,self.backLeftDistance.median,self.backRightDistance.median))
+        if self.frontLeftDistance.median > distEOF and self.frontRightDistance.median > distEOF or self.backLeftDistance.median > distEOF and self.backRightDistance.median > distEOF:
             return True
         return False
