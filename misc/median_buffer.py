@@ -29,7 +29,7 @@ class MedianBuffer:
         self.__internallist.appendleft(num)
         self.__sortedlist = list(self.__internallist)
         self.__sortedlist.sort()
-        self.median = self.__sortedlist[int(self.count/2)]
+        self.median = self.__sortedlist[self.count/2]
         return
 
 

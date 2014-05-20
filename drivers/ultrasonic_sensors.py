@@ -96,7 +96,7 @@ class UltrasonicSensors:
 
         self.__pingAll()
 
-        return self.frontDistance, self.backDistance, self.frontLeftDistance, self.frontRightDistance, self.backLeftDistance, self.backRightDistance
+        return self.frontDistance, self.backDistance, self.frontLeftDistance.median, self.frontRightDistance.median, self.backLeftDistance.median, self.backRightDistance.median
 
     def getSpeedScalingFront(self):  # TODO: Test
         if self.frontDistance <= self.distanceStop:
