@@ -34,7 +34,7 @@ class KalmanFilter(object):
     def GetCurrentState(self):
         return self.current_state_estimate
         
-    def getCurrentAngle:
+    def getCurrentAngle(self):
         return int(self.current_state_estimate[0])
 
     def Step(self, control_vector, measurement_vector):

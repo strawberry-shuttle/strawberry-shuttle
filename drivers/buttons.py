@@ -2,17 +2,16 @@
 from __future__ import division
 __author__ = 'Scotty Waggoner'
 
-from enum import Enum
 import Adafruit_BBIO.GPIO as GPIO
+from misc.log import Log
 
-class ButtonState(Enum):
+class ButtonState:
     noBtn = 0
     stopBtn = 1
     forwardBtn = 2 #  Send in back and Follow in front
     backBtn = 4 #  Send in front and Follow in back
     frontBumper = 8
     backBumper = 16
-
 
 class Buttons:
 
@@ -43,4 +42,6 @@ class Buttons:
             self.buttonState |= ButtonState.backBtn
         if GPIO.event_detected("P8_11"):
             self.buttonState |= ButtonState.stopBtn
+	l = Log()
+	l.ShowDebug("ButtonState: %d" % self.buttonState)
         return self.buttonState

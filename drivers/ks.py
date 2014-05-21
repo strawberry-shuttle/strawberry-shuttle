@@ -6,7 +6,6 @@ __author__ = 'Vijay Ganesan'
 from drivers.BBB_lib.Adafruit_I2C import Adafruit_I2C
 from time import sleep
 
-
 class Ultrasonic_KS:
     """Kingsin KS 103B Ultrasonic Sensor Class"""
     def __init__(self, addr=0x74, debug=0):  # Initialize using default sensor address

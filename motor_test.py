@@ -26,7 +26,6 @@ while 1:
     currentTime = time()
     finalTime = currentTime + t
     
-
     while GPIO.input("P8_9") and finalTime-currentTime > 0:
         currentTime = time()
 
