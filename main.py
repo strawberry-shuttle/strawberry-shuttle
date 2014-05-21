@@ -1,6 +1,6 @@
 __author__ = 'Scotty Waggoner, Vijay Ganesan, Evan Racah'
 from control.state.state import StateManager
-from control.state.state import State  # Enum class
+from control.state.state import State  # States
 from drivers.motors import Motors
 from drivers.ultrasonic_sensors import UltrasonicSensors
 from drivers.buttons import Buttons
