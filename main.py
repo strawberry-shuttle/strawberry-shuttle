@@ -58,7 +58,7 @@ class Control:
     def getMeasurements(self):
         self.ultrasonicSensors.updateDistances()
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
-        backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles()
+        backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
         return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle],
                           [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
@@ -67,8 +67,8 @@ class Control:
         measVector = self.getMeasurements()
         controlVector = np.matrix([[self.commandedRPSDiff]])
         self.kalman.Step(controlVector, measVector)
-        curAngle = self.kalman.getCurrentAngle()
-        return self.PID.update(curAngle)
+        self.curAngle = self.kalman.getCurrentAngle()
+        return self.PID.update(self.curAngle)
 
     def moveInFurrow(self):
         scaledSpeed = self.desiredSpeed * self.obstacleSpeedScaling()  # slow robot if obstacle detected

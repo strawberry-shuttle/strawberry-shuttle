@@ -147,7 +147,7 @@ class Motors:
         rightDistTravelled = encRightDiff * mechInfo.wheelCircumference
         return (leftDistTravelled - rightDistTravelled) / mechInfo.robotWidth
 
-    def getEncoderAngles(self):
+    def getEncoderAngles(self, currentAngleEstimate):
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
         self.frontAngle += self.__getDiffAngle(leftFrontDiff, rightFrontDiff)
         self.backAngle += self.__getDiffAngle(leftBackDiff, rightBackDiff)

@@ -7,13 +7,16 @@ import misc.mechInfo
 import random
 import math
 import Adafruit_BBIO.GPIO as GPIO
+from drivers.ultrasonic_sensors import UltrasonicSensors
 
 
-def takeReadings(t,rps,t0):
+def takeReadings(t,rps,t0,us):
 		t.append(time() - t0)
+		ultrasonic.updateDistances()
+		us.append(ultrasonic.calculateAngle())
 		rps.append(tuple(motor.readEncoderSpeeds()))
 		sleep(delay)
-		return t,rps
+		return t,rps,us
 
 def timeResponse(accel,speed,delay,totalTime):
 	
@@ -26,20 +29,20 @@ def timeResponse(accel,speed,delay,totalTime):
 
 	t0 = time()
 	t = [0]
+	ultrasonic.updateDistances()
+	us = [ultrasonic.calculateAngle()]
 	rps = [tuple(motor.readEncoderSpeeds())]
 	motor.moveForward(speed,speed)
-	
-
 	sleep(delay)
 
 	#takes readings for 2 seconds before responding to button to stop it
 	while (t[-1] < 2):
 	#take readings has access to variables inside timeResponse?
-		t,rps = takeReadings(t,rps,t0)
+		t,rps,us = takeReadings(t,rps,t0,us)
 
 	#now does same thing but checks for button to stop
 	while GPIO.input("P8_9") and ((t[-1] - t0) < 10):
-		t,rps = takeReadings(t,rps,t0)
+		t,rps,us = takeReadings(t,rps,t0,us)
 
 	motor.moveForward(0,0)
 
@@ -62,12 +65,22 @@ def timeResponse(accel,speed,delay,totalTime):
 			f.write("%s\n"%point)
 		f.close()
 		count += 1
+
+	fileString ="UltrasonicAngleData.txt"
+	f = open(fileString, 'w')
+	for point in us:
+		for angle in point:
+			angle = angle * 180 / math.pi
+			f.write("%s "%angle)
+		f.write("\n")
+	f.close()
    
 if __name__=="__main__":
 	accel = 1
 	rps = 1.0
 	delay = 0.05
 	totalTime = 10
+	ultrasonic = UltrasonicSensors()
 	motor = Motors(accel)
 	GPIO.setup("P8_9", GPIO.IN) 
 	timeResponse(accel,rps,delay,totalTime)

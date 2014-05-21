@@ -9,12 +9,16 @@ import time
 import Adafruit_BBIO.GPIO as GPIO
 
 
+
 def test(numMeas):
 	while GPIO.input("P8_9"):
 	   pass
 	
 	ultrasonicSensors = UltrasonicSensors()
 	rawData = np.zeros(shape=(6,numMeas))
+	ultrasonicSensors.updateDistances()
+	motors.frontAngle = np.mean(ultrasonicSensors.calculateAngle())
+	motors.backAngle = motors.frontAngle
 	motors.moveForward(1,1)
 	for i in range(numMeas):
 		ultrasonicSensors.updateDistances()
