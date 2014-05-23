@@ -12,7 +12,7 @@ __author__ = 'Evan Racah, Greg Czerniak'
 #TODO: calculate dt thru timing
 import numpy as np
 import time
-from misc.mechInfo import G
+from misc.mechInfo import overallTransferFunction 
 
 
 # Implements a linear Kalman filter.
@@ -25,9 +25,9 @@ class KalmanFilter(object):
     # current_prob_estimate: covariance estimate.
     # Q: Estimated error in process.
     # R: Estimated error in measurements.
-    def __init__(self):
+    def __init__(self,ultrasoncAngle):
         self.A, self.B, self.H, self.current_state_estimate, \
-            self.current_prob_estimate, self.Q, self.R = self.setUpMatrices()
+            self.current_prob_estimate, self.Q, self.R = self.setUpMatrices(ultrasoncAngle)
 
         self.lastTime = time.time()
 
@@ -40,7 +40,7 @@ class KalmanFilter(object):
     def Step(self, control_vector, measurement_vector):
         now = time.time()
         timeStep = now - self.lastTime
-        self.A[0, 1] = G * timeStep  # mechInfo.G * timeStep
+        self.A[0, 1] = overallTransferFunction * timeStep  # mechInfo.G * timeStep
         self.lastTime = now
         #---------------------------Prediction step-----------------------------
         
@@ -61,28 +61,28 @@ class KalmanFilter(object):
         self.current_prob_estimate = (np.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
     @staticmethod
-    def setUpMatrices():
+    def setUpMatrices(ultrasoncAngle):
         placeError = 0.001  # human error in placing robot straight in field
         motorSpinError = 0.00001
-        processNoise = 0.001
+        processNoise = 0.01
         measNoise = 0.001
         dt = 0  # we don't know this yet but we will correct it before needed
         #G = radius_of_wheel / width of robot
 
-        A = np.matrix([[1, G *dt], [0, 0]])
+        A = np.matrix([[1, overallTransferFunction*dt], [0, 0]])
         B = np.matrix([[0], [1]])
         # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],
         #[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]])
-        H = np.matrix([[1, 0], [1, 0], [1, 0], [1, 0], [0, 1], [0, 1]])
-        x = np.matrix([[0], [0]])  # [theta, wdiff]
+        H = np.matrix([[1, 0], [1, 0], [1, 0], [0, 1]])
+        x = np.matrix([[ultrasonicAngle], [0]])  # [theta, wdiff]
         P = np.matrix([[placeError, 0], [0, motorSpinError]])
         #TODO fix q and r
         Q = np.matrix([[processNoise, 0], [0, processNoise]])  # process noise
-        R = np.identity(6)*measNoise
+        R = np.identity(4)*measNoise
 
         return [A, B, H, x, P, Q, R]
 
 
 if __name__ == "__main__":
-    dt = 0.0001  # we need to calculate this
+    
     kalman = KalmanFilter()

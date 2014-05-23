@@ -41,7 +41,8 @@ class Control:
         self.stateManager = StateManager()
         self.buttons = Buttons()
         self.PID = PIDControl(0, (1, 0, 0))  # update these values
-        self.kalman = KalmanFilter()
+        self.ultrasonicSensors.updateDistances()
+        self.kalman = KalmanFilter(mean(self.ultrasonicSensors.calculateAngle()))
         self.commandedRPSDiff = 0
         self.desiredSpeed = mechInfo.desiredSpeed
 

@@ -15,16 +15,16 @@ def test(numMeas):
 	   pass
 	
 	ultrasonicSensors = UltrasonicSensors()
-	rawData = np.zeros(shape=(6,numMeas))
+	rawData = np.zeros(shape=(4,numMeas))
 	ultrasonicSensors.updateDistances()
-	motors.frontAngle = np.mean(ultrasonicSensors.calculateAngle())
-	motors.backAngle = motors.frontAngle
+	# motors.frontAngle = np.mean(ultrasonicSensors.calculateAngle())
+	motors.backAngle = np.mean(ultrasonicSensors.calculateAngle())
 	motors.moveForward(1,1)
 	for i in range(numMeas):
 		ultrasonicSensors.updateDistances()
 		rawData[0,i],rawData[1,i] = ultrasonicSensors.calculateAngle() #right and left ultrasonic sensor
-		rawData[2,i], rawData[3,i] = motors.getEncoderAngles()
-		rawData[4,i], rawData[5,i] = motors.getSpeedDiff()
+		junk, rawData[2,i] = motors.getEncoderAngles()
+		junkToo, rawData[3,i] = motors.getSpeedDiff()
 		time.sleep(0.1)
 
 	
