@@ -15,8 +15,8 @@ class State:
 
 class StateManager:
     def __init__(self):
-        self.currentState = State.moveForward
-        #self.currentState = State.canceled
+        #self.currentState = State.moveForward
+        self.currentState = State.canceled
 
     def updateState(self, button_state, end_of_furrow):
         state = self.currentState
@@ -34,8 +34,10 @@ class StateManager:
         #Move Backwards if front bumper and not moving, or the back button is hit
         elif ( (button_state & ButtonState.backBtn) or ((button_state & ButtonState.frontBumper) and stopped) ):
             self.currentState = State.moveBackward
-	l = Log()
-	l.ShowDebug("Current State %d" % self.currentState)
+        
+        l = Log()
+        l.ShowDebug("Current State %d" % self.currentState)
+        
         return self.currentState
         
     def changeState(self, newState):
