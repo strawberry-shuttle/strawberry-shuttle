@@ -149,8 +149,8 @@ class Motors:
 
     def getEncoderAngles(self, currentAngleEstimate):
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
-        self.frontAngle += self.__getDiffAngle(leftFrontDiff, rightFrontDiff)
-        self.backAngle += self.__getDiffAngle(leftBackDiff, rightBackDiff)
+        self.frontAngle = currentAngleEstimate + self.__getDiffAngle(leftFrontDiff, rightFrontDiff)
+        self.backAngle = currentAngleEstimate + self.__getDiffAngle(leftBackDiff, rightBackDiff)
         return [self.frontAngle, self.backAngle]
 
     def getSpeedDiff(self):

@@ -40,11 +40,13 @@ class Control:
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
         self.buttons = Buttons()
-        self.PID = PIDControl(0, (1, 0, 0))  # update these values
+        self.PID = PIDControl(0, (1.2, 0.01, 1.1))  # update these values
         self.ultrasonicSensors.updateDistances()
-        self.kalman = KalmanFilter(mean(self.ultrasonicSensors.calculateAngle()))
+        self.curAngle = np.mean(self.ultrasonicSensors.calculateAngle())
+        self.kalman = KalmanFilter(self.curAngle)
         self.commandedRPSDiff = 0
         self.desiredSpeed = mechInfo.desiredSpeed
+
 
     def obstacleSpeedScaling(self):
         if self.stateManager.currentState == State.moveForward:
@@ -62,7 +64,7 @@ class Control:
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
         return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle],
-                          [frontEncoderAngle], [speedDiffFront], [speedDiffBack]])  # camera angle eventually
+                          [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
         measVector = self.getMeasurements()

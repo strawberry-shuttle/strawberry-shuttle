@@ -25,9 +25,9 @@ class KalmanFilter(object):
     # current_prob_estimate: covariance estimate.
     # Q: Estimated error in process.
     # R: Estimated error in measurements.
-    def __init__(self,ultrasoncAngle):
+    def __init__(self,ultrasonicAngle):
         self.A, self.B, self.H, self.current_state_estimate, \
-            self.current_prob_estimate, self.Q, self.R = self.setUpMatrices(ultrasoncAngle)
+            self.current_prob_estimate, self.Q, self.R = self.setUpMatrices(ultrasonicAngle)
 
         self.lastTime = time.time()
 
@@ -61,7 +61,7 @@ class KalmanFilter(object):
         self.current_prob_estimate = (np.eye(size)-kalman_gain*self.H)*predicted_prob_estimate
 
     @staticmethod
-    def setUpMatrices(ultrasoncAngle):
+    def setUpMatrices(ultrasonicAngle):
         placeError = 0.001  # human error in placing robot straight in field
         motorSpinError = 0.00001
         processNoise = 0.01
@@ -78,11 +78,14 @@ class KalmanFilter(object):
         P = np.matrix([[placeError, 0], [0, motorSpinError]])
         #TODO fix q and r
         Q = np.matrix([[processNoise, 0], [0, processNoise]])  # process noise
-        R = np.identity(4)*measNoise
+        R = np.matrix([[  3.27770060e-03,  -4.36182318e-04,   1.95655374e-02,  -1.01897747e-03],
+                         [ -4.36182318e-04,   3.12033167e-04,  -8.12172969e-04,  -1.16891148e-03],
+                         [  1.95655374e-02,  -8.12172969e-04,   7.81733113e-01,  -2.77255777e-02],
+                         [ -1.01897747e-03,  -1.16891148e-03,  -2.77255777e-02,   4.88421055e-02]])
 
         return [A, B, H, x, P, Q, R]
 
 
 if __name__ == "__main__":
     
-    kalman = KalmanFilter()
+    kalman = KalmanFilter(12)
