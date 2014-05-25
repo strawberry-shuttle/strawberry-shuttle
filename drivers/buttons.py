@@ -43,5 +43,5 @@ class Buttons:
         if GPIO.event_detected("P8_11"):
             self.buttonState |= ButtonState.stopBtn
 	l = Log()
-	l.ShowDebug("ButtonState: %d" % self.buttonState)
+	# l.ShowDebug("ButtonState: %d" % self.buttonState)
         return self.buttonState

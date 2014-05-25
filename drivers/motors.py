@@ -143,6 +143,7 @@ class Motors:
 
     @staticmethod
     def __getDiffAngle(encLeftDiff, encRightDiff):
+        #turning right is positive angle
         leftDistTravelled = encLeftDiff * mechInfo.wheelCircumference
         rightDistTravelled = encRightDiff * mechInfo.wheelCircumference
         return (leftDistTravelled - rightDistTravelled) / mechInfo.robotWidth

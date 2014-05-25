@@ -13,13 +13,14 @@ t = rotations/rps
 
 GPIO.setup("P8_9", GPIO.IN)   # Forward Button
 
-m = Motors(1)
+m = Motors()
 
 while 1:
     while GPIO.input("P8_9"):
         pass
 
-    m.moveForward(rps, rps)
+    m.moveForward(0,0.75)
+    m.printEncoderSpeeds()
     
     sleep(2)
 
@@ -28,6 +29,7 @@ while 1:
     
     while GPIO.input("P8_9") and finalTime-currentTime > 0:
         currentTime = time()
+        m.printEncoderSpeeds()
 
     m.moveForward(0, 0)
     sleep(3)

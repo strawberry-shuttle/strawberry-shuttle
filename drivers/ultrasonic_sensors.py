@@ -88,6 +88,7 @@ class UltrasonicSensors:
         return self.backRightDistance.median
 
     def updateDistances(self):
+
         self.__readFrontLeft()
         self.__readBackRight()
         #self.__readFront()
@@ -124,5 +125,5 @@ class UltrasonicSensors:
 #        l = Log()
 #        l.ShowDebug("Distances: %u %u %u %u" % (self.frontLeftDistance.median,self.frontRightDistance.median,self.backLeftDistance.median,self.backRightDistance.median))
         if self.frontLeftDistance.median > distEOF and self.frontRightDistance.median > distEOF or self.backLeftDistance.median > distEOF and self.backRightDistance.median > distEOF:
-            return True
+            retur
         return False

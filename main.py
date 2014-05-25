@@ -10,9 +10,11 @@ from control.kalman.kalman import KalmanFilter
 from misc import mechInfo
 from misc.log import Log
 import numpy as np
+import math
+import time
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
-#POsitive angle means turned to right -> we could change this
+#Positive angle means turned to right
 #Speed unit is Revolutions per Second (RPS)
 
 '''
@@ -40,12 +42,15 @@ class Control:
         self.ultrasonicSensors = UltrasonicSensors()
         self.stateManager = StateManager()
         self.buttons = Buttons()
-        self.PID = PIDControl(0, (1.2, 0.01, 1.1))  # update these values
+        self.minSpeed = 0.0
+        self.maxSpeed = self.motors.maxSpeed()
+        self.PID = PIDControl(0, (2, 0.01, 1.1),(self.minSpeed,self.maxSpeed))  # update these values
         self.ultrasonicSensors.updateDistances()
         self.curAngle = np.mean(self.ultrasonicSensors.calculateAngle())
         self.kalman = KalmanFilter(self.curAngle)
         self.commandedRPSDiff = 0
         self.desiredSpeed = mechInfo.desiredSpeed
+
 
 
     def obstacleSpeedScaling(self):
@@ -59,7 +64,7 @@ class Control:
             return 0 #Should never happen, will force stop
 
     def getMeasurements(self):
-        self.ultrasonicSensors.updateDistances()
+        #self.ultrasonicSensors.updateDistances()
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
@@ -68,6 +73,7 @@ class Control:
 
     def determineSpeedInput(self):
         measVector = self.getMeasurements()
+        #measVector[1] = measVector[0] #COMMENT THIS OUT WHEN THE RIGHT ULTRASONICS FIXED
         controlVector = np.matrix([[self.commandedRPSDiff]])
         self.kalman.Step(controlVector, measVector)
         self.curAngle = self.kalman.getCurrentAngle()
@@ -85,9 +91,21 @@ class Control:
     def run(self):  # Main function
         while True:
             #TODO: Get information from cameras
+            print "distances", self.ultrasonicSensors.updateDistances()
+            print "maxspeed",self.motors.maxSpeed()
+            print "\nus"
+            for angle in self.ultrasonicSensors.calculateAngle():
+                print angle * 180.0 / math.pi
+            print "\nkalman angle"
+            print self.curAngle * 180.0 / math.pi  
+            print self.commandedRPSDiff, self.commandedRPSDiff / 2
+            print "left wheel", self.desiredSpeed * self.obstacleSpeedScaling() + self.commandedRPSDiff / 2
+            print "right wheel", self.desiredSpeed * self.obstacleSpeedScaling() - self.commandedRPSDiff / 2 
+            #time.sleep(0.5)
             self.buttons.updateButtonStates()  # TODO: Testing button states
-            self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
+            self.stateManager.updateState(self.buttons.buttonState, False)#self.ultrasonicSensors.endOfFurrow())
             if not (self.stateManager.currentState & State.stopped):  # Robot not stopped
+               
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else:  # TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:

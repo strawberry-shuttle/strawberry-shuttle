@@ -8,7 +8,7 @@ from time import sleep
 
 class Ultrasonic_KS:
     """Kingsin KS 103B Ultrasonic Sensor Class"""
-    def __init__(self, addr=0x74, debug=0):  # Initialize using default sensor address
+    def __init__(self, addr=0x74, debug=False):  # Initialize using default sensor address
         self.addr = addr >> 1
         self.debug = debug
         self.i2c = Adafruit_I2C(self.addr, -1, debug)

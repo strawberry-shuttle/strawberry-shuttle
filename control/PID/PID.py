@@ -5,14 +5,14 @@ import time
 
 
 class PIDControl(object):
-    def __init__(self, setPoint, coefficients):
+    def __init__(self, setPoint, coefficients, outputRange):
+        self.min, self.max = outputRange
         self.setPoint = setPoint
         self.lastTime = time.time()
         self.kP, self.kI, self.kD = coefficients
         self.errorTotal = 0.0
         self.previousError = 0.0
-        #self.max_error = 180
-        #self.min_error = -180
+      
 
     def update(self, measurement):
         #update time stuff
@@ -33,7 +33,13 @@ class PIDControl(object):
         self.lastTime = now
         self.previousError = error
 
-        return P + I + D
+        output = P + I + D
+        # if output > self.max:
+        #     output = self.max
+        # elif output < self.min:
+        #     output = self.min
+
+        return output
 
     def set_set_point(self, setPoint):
         self.setPoint = setPoint
