@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 	namedWindow( "Display window", WINDOW_AUTOSIZE );
     imshow( "Display window", img );
 	bool done;
-    
+
 	do
 	{
 	  cv::erode(img, eroded, element);
@@ -39,6 +39,25 @@ int main(int argc, char** argv)
 	  done = (cv::countNonZero(img) == 0);
 	  //TODO: Generate a rectangle to use to check if the forward path is straight ahead, or if we're angled, based on what point of intersection we see in our rectangle (if none, it's straight)
 	  imshow( "Display window", img );
-	  waitKey(0);
+	  int key = cvWaitKey();
+      if(key == 27)
+        break;
 	} while (!done);
+    cout << "Broken out!" << endl;
+    Mat dst, cdst;
+    Canny(img, dst, 50, 200, 3);
+    cvtColor(dst, cdst, CV_GRAY2BGR);
+    vector<Vec4i> lines;
+    HoughLinesP(dst, lines, 1, CV_PI/180, 50, 50, 10 );
+//    for( size_t i = 0; i < lines.size(); i++ )
+//    {
+//        Vec4i l = lines[i];
+//        line( cdst, Point(l[0], l[1]), Point(l[2], l[3]), Scalar(0,0,255), 3, CV_AA);
+//    }
+
+    imshow( "Display window", dst );
+
+    waitKey(0);
+    return 0;
+
 }
