@@ -5,6 +5,12 @@
 
 #include <iostream>
 
+
+#define LINE_DIST 30 //Line distance from center of image
+#define LINE_HEIGHT 175
+#define LINE_OFFSET -50
+
+
 using namespace cv;
 using namespace std;
 
@@ -19,16 +25,18 @@ int main(int argc, char** argv)
         return -1;
     }
 
-	cv::threshold(img, img, 127, 255, cv::THRESH_BINARY); 
+	cv::threshold(img, img, 127, 255, cv::THRESH_BINARY);
 	cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
 	cv::Mat temp;
 	cv::Mat eroded;
- 
+
 	cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(2, 2));
 	namedWindow( "Display window", WINDOW_AUTOSIZE );
     imshow( "Display window", img );
 	bool done;
-    
+
+
+    //Erode image (effectively a noise filter)
 	do
 	{
 	  cv::erode(img, eroded, element);
@@ -37,8 +45,33 @@ int main(int argc, char** argv)
 	  cv::bitwise_or(skel, temp, skel);
 	  eroded.copyTo(img);
 	  done = (cv::countNonZero(img) == 0);
-	  //TODO: Generate a rectangle to use to check if the forward path is straight ahead, or if we're angled, based on what point of intersection we see in our rectangle (if none, it's straight)
 	  imshow( "Display window", img );
-	  waitKey(0);
+	  int key = cvWaitKey();
+      if(key == 27)
+        break;
 	} while (!done);
+
+    cout << "Broken out!" << endl;
+
+    //Run Canny to generate skeleton
+    Mat dst;
+    Canny(img, dst, 50, 200, 3);
+
+    imshow( "Display window", dst );
+
+    waitKey(0);
+
+    //Check if there exists any points intercepting the 'invisible' lines
+    cv::Size s = dst.size();
+
+    line(dst,Point((s.width/2)+LINE_DIST+LINE_OFFSET,s.height),Point((s.width/2)+LINE_DIST+LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
+    line(dst,Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height),Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
+    cout << s.width << "x" << s.height << endl;
+    imshow( "Display window", dst);
+    waitKey(0);
+
+    
+
+    return 0;
+
 }
