@@ -130,7 +130,6 @@ CvMat* adjustHeight(IplImage* image, CvMat* H, CvPoint2D32f imgPts[], CvPoint2D3
     if(key == 's') boardHeight -=1;
     if(key == 'a') boardWidth -=1;
     if(key == 'd') boardWidth +=1;
-
     }//while
     cvSave("H.xml",H);
     return H;

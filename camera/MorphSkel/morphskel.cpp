@@ -6,9 +6,9 @@
 #include <iostream>
 
 
-#define LINE_DIST 30 //Line distance from center of image
+#define LINE_DIST 10 //Line distance from center of image
 #define LINE_HEIGHT 175
-#define LINE_OFFSET -50
+#define LINE_OFFSET -15
 
 
 using namespace cv;
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	bool done;
 
 
-    //Erode image (effectively a noise filter)
+    //Dilate and Erode image
 	do
 	{
 	  cv::erode(img, eroded, element);
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 
     cout << "Broken out!" << endl;
 
-    //Run Canny to generate skeleton
+    //Run Canny to generate edges of the dilated/eroded image
     Mat dst;
     Canny(img, dst, 50, 200, 3);
 
@@ -70,7 +70,6 @@ int main(int argc, char** argv)
     imshow( "Display window", dst);
     waitKey(0);
 
-    
 
     return 0;
 
