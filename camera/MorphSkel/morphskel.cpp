@@ -26,7 +26,6 @@ int main(int argc, char** argv)
     }
 
 	cv::threshold(img, img, 127, 255, cv::THRESH_BINARY);
-	cv::Mat skel(img.size(), CV_8UC1, cv::Scalar(0));
 	cv::Mat temp;
 	cv::Mat eroded;
 
@@ -42,7 +41,6 @@ int main(int argc, char** argv)
 	  cv::erode(img, eroded, element);
 	  cv::dilate(eroded, temp, element);
 	  cv::subtract(img, temp, temp);
-	  cv::bitwise_or(skel, temp, skel);
 	  eroded.copyTo(img);
 	  done = (cv::countNonZero(img) == 0);
 	  imshow( "Display window", img );
@@ -70,7 +68,5 @@ int main(int argc, char** argv)
     imshow( "Display window", dst);
     waitKey(0);
 
-
     return 0;
-
 }
