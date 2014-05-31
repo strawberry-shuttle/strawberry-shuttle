@@ -11,22 +11,14 @@ using namespace cv;
 
 using namespace std;
 
-IplImage* drawPoints(IplImage* image, CvPoint2D32f imgPts[])
-{
-    // DRAW THE POINTS in order: B,G,R,YELLOW
-    cvCircle( image, cvPointFrom32f(imgPts[0]), 9, CV_RGB(0,0,255), 3); //blue
-    cvCircle( image, cvPointFrom32f(imgPts[1]), 9, CV_RGB(0,255,0), 3); //green
-    cvCircle( image, cvPointFrom32f(imgPts[2]), 9, CV_RGB(255,0,0), 3); //red
-    cvCircle( image, cvPointFrom32f(imgPts[3]), 9, CV_RGB(255,255,0), 3); //yellow
-    return image;  
-}
+
 
 void setObjPts(CvPoint2D32f objPts[], int boardHeight,int boardWidth)
 {
     objPts[0].x = 0; objPts[0].y = 0;
-    objPts[1].x = boardWidth -1; objPts[1].y = 0;
-    objPts[2].x = 0; objPts[2].y = boardHeight -1;
-    objPts[3].x = boardWidth -1; objPts[3].y = boardHeight -1;  
+    objPts[1].x = boardWidth ; objPts[1].y = 0;
+    objPts[2].x = 0; objPts[2].y = boardHeight;
+    objPts[3].x = boardWidth ; objPts[3].y = boardHeight;  
 }
 
 void getCorners(IplImage* image, int imageWidth, int imageHeight,CvPoint2D32f dots[])
@@ -163,7 +155,7 @@ CvMat* getHMatrix(IplImage* image, int boardWidth, int boardHeight)
 
     setObjPts(objPts,boardHeight,boardWidth);
 
-    image = drawPoints(image,imgPts);
+    
     
     
   
@@ -191,7 +183,7 @@ int main(int argc, char* argv[])
         capture = cvCreateCameraCapture(0);
     else
     {
-      cout<<"hey"<<endl;
+    
       capture = cvCreateFileCapture(argv[3]);  
     }
         
