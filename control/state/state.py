@@ -34,8 +34,10 @@ class StateManager:
         #Move Backwards if front bumper and not moving, or the back button is hit
         elif ( (button_state & ButtonState.backBtn) or ((button_state & ButtonState.frontBumper) and stopped) ):
             self.currentState = State.moveBackward
-	l = Log()
-	# l.ShowDebug("Current State %d" % self.currentState)
+        
+        l = Log()
+        l.ShowDebug("Current State %d" % self.currentState)
+        
         return self.currentState
         
     def changeState(self, newState):

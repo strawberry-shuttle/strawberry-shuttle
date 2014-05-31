@@ -1,22 +1,45 @@
-#Oliver Chen
-#simple fuzzy logic implementation
+__author__ = 'Oliver Chen'
 
-from BBB.roboclaw import Roboclaw
-
-frontclaw = Roboclaw(add, port) #the roboclaw controlling the front motors
-backclaw = Roboclaw(add, port) #the roboclaw controlling the back motors
-avgspeed = 50; #average forward speed of the robot
-
-def setmotors(turnrate): #sets the speed of the motors based on the required turnrate
-	frontclaw.m1_forward(avgspeed*turnrate)		#.5 means straight (50% power to both motors)
-	backclaw.m1_forward(avgspeed*turnrate)		#>.5 turns to the right (>50% power to the right motor, <50% to the left motor)
-	frontclaw.m2_forward(avgspeed*(1-turnrate))	#<.5 turns to the left (<50% power to the left motor, >50% to the right motor)
-	backclaw.m2_forward(avgspeed*(1-turnrate))
-
-def fuzzy(angle, distance): #reads in the angle (0 means straight, >0 means right, <0 means left)
-	a = -.01 * angle		#and the distance from the walls (.5 means centered, .75 means halfway to the right wall, etc)
-	if distance > .6:	#a is how much the turnrate is affected by the current angle
-		d = .6 - d		#d is how much the turnrate should be affected by the current distance from he walls
-	if distance < .4:	#may need to multiply a and d by constants if the robot reacts too quickly or too slowly to either variable
-		d = .4 - d
-	setmotors(.5 + a + d)
+from misc import mechInfo
+	
+class fuzzyControl:
+    def __init__(self):
+		self.desiredSpeed = mechInfo.desiredSpeed
+		self.robotWidth = mechInfo.robotWidth
+		self.turnRadius = 30
+	
+	#fuzzyAngle determines the two motor speeds [left motor, right motor] in terms of RPS
+	#based on the angle of the robot relative to the furrow. It turns around a radius of
+	#turnRadius*(30/angle), but that can be tweaked depending on experimental results
+	def fuzzyAngle(angle):
+		return [self.desiredSpeed*(1 - (angle/30) * self.robotWidth/(2 * self.turnRadius)),
+				self.desiredSpeed*(1 + (angle/30) * self.robotWidth/(2 * self.turnRadius))]
+	
+	#Pass the function four ultrasound measurements [fl, fr, bl, br]
+	def fuzzyFindDist(ultrasoundMeasurements):
+		return [(ultrasoundMeasurements[0] + ultrasoundMeasurements[2])/2,
+				(ultrasoundMeasurements[1] + ultrasoundMeasurements[3])/2]
+	
+	#fuzztDist determines the two motor speeds [left motor, right motor] in terms of RPS
+	#based on the distances of the robot relative to the furrow. It only turns if you are outside
+	#the center X cm of the furrow. It turns around a radius of turnRadius*(30/speedDiff), which
+	#can again be tweaked depending on experimental results
+	#Pass the function four ultrasound measurements [fl, fr, bl, br]
+	def fuzzyDist(ultrasoundMeasurements):
+		distances = self.fuzzyFindDist(ultrasoundMeasurements)
+		speedDiff = distances[1] - distances[0]
+		center = 3 #in cm
+		if speedDiff > center/2
+			speedDiff = speedDiff - center/2
+		elif speedDiff < -center/2
+			speedDiff = speedDiff + center/2
+		else
+			speedDiff = 0
+		return [self.desiredSpeed*(1 - (speedDiff/30) * self.robotWidth/(2 * self.turnRadius)),
+				self.desiredSpeed*(1 + (speedDiff/30) * self.robotWidth/(2 * self.turnRadius))]
+	
+	#simply runs all of the functions
+	def fuzzy(angle, ultrasoundMeasurements)
+		fd = self.fuzzyDist(ultrasoundMeasurements)
+		fa = self.fuzzyAngle(angle)
+		return [fd[0] + fa[0], fd[1] + fa[1]]
