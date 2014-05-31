@@ -6,10 +6,10 @@
 #include <iostream>
 
 
-#define LINE_DIST 10 //Line distance from center of image
+//#define LINE_DIST 10 //Line distance from center of image
 #define LINE_HEIGHT 175
-#define LINE_OFFSET -15
-
+#define LINE_OFFSET -5
+#define FILTER_COUNT 5
 
 using namespace cv;
 using namespace std;
@@ -25,29 +25,25 @@ int main(int argc, char** argv)
         return -1;
     }
 
-	cv::threshold(img, img, 127, 255, cv::THRESH_BINARY);
-	cv::Mat temp;
-	cv::Mat eroded;
+	threshold(img, img, 127, 255, THRESH_BINARY);
+	Mat temp;
+	Mat eroded;
 
-	cv::Mat element = cv::getStructuringElement(cv::MORPH_CROSS, cv::Size(2, 2));
+	Mat element = getStructuringElement(MORPH_CROSS, Size(2, 2));
 	namedWindow( "Display window", WINDOW_AUTOSIZE );
     imshow( "Display window", img );
-	bool done;
 
-
+    waitKey(0);
     //Dilate and Erode image
-	do
-	{
-	  cv::erode(img, eroded, element);
-	  cv::dilate(eroded, temp, element);
-	  cv::subtract(img, temp, temp);
+    for(int i = 0; i < FILTER_COUNT; i++)
+    {
+	  erode(img, eroded, element);
+	  dilate(eroded, temp, element);
+	  subtract(img, temp, temp);
 	  eroded.copyTo(img);
-	  done = (cv::countNonZero(img) == 0);
 	  imshow( "Display window", img );
-	  int key = cvWaitKey();
-      if(key == 27)
-        break;
-	} while (!done);
+    }
+    waitKey(0);
 
     cout << "Broken out!" << endl;
 
@@ -60,10 +56,10 @@ int main(int argc, char** argv)
     waitKey(0);
 
     //Check if there exists any points intercepting the 'invisible' lines
-    cv::Size s = dst.size();
+    Size s = dst.size();
 
-    line(dst,Point((s.width/2)+LINE_DIST+LINE_OFFSET,s.height),Point((s.width/2)+LINE_DIST+LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
-    line(dst,Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height),Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
+    line(dst,Point((s.width/2)+/*LINE_DIST+*/LINE_OFFSET,s.height),Point((s.width/2)+/*LINE_DIST+*/LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
+    //line(dst,Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height),Point((s.width/2)-LINE_DIST+LINE_OFFSET,s.height-LINE_HEIGHT),Scalar(255,0,255),3,CV_AA);
     cout << s.width << "x" << s.height << endl;
     imshow( "Display window", dst);
     waitKey(0);
