@@ -12,7 +12,7 @@
 #define LINE_OFFSET -40
 #define FILTER_COUNT 5
 #define MIN_HEIGHT 0 //How far up the line we go
-#define POINT_THRESHOLD 10 //How off a point can be from the predicted value when determining line slope
+#define POINT_THRESHOLD 5 //How off a point can be from the predicted value when determining line slope
 
 using namespace cv;
 using namespace std;
