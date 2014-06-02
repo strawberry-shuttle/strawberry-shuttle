@@ -8,10 +8,10 @@ from time import sleep
 
 class Ultrasonic_MB:
     """Maxbotix MB1202 I2C Ultrasonic Sensor Class"""
-    def __init__(self, addr=0x70, debug=0):  # Initialize using default sensor address
+    def __init__(self, addr=0x70, debug=False,busnum=-1):  # Initialize using default sensor address
         self.addr = addr
         self.debug = debug
-        self.i2c = Adafruit_I2C(self.addr, -1, debug)
+        self.i2c = Adafruit_I2C(self.addr, busnum, debug)
 
     def setAddr(self, addr):  # Modify the sensor address, WARNING: Use very sparingly, addresses are saved over power cycles
         addr <<= 1
