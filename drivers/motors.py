@@ -174,9 +174,6 @@ class Motors:
         backBatteryVoltage = self.back_motors.read_main_battery() / 10
         print "Front Voltage Reading:", frontBatteryVoltage, "V"
         print "Back  Voltage Reading:", backBatteryVoltage, "V"
-
-        print
-
         frontBatterySettings = self.front_motors.read_main_battery_settings()
         backBatterySettings = self.back_motors.read_main_battery_settings()
         print "Low Voltage Cutoff - Front:", frontBatterySettings[0] / 10, "V Back:", backBatterySettings[0] / 10, "V"

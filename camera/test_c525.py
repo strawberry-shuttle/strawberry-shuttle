@@ -3,7 +3,6 @@
 import cv2
 import sys
 
-
 vc = cv2.VideoCapture(0)
 
 vc.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH,1280)
@@ -19,8 +18,6 @@ for count in range(0,5):
         print("Could not read!");
         sys.exit(1)
     cv2.imwrite('capture_%02d.png' % count,frame)
-
-
 
 vc.release()
 vc = None
