@@ -40,7 +40,7 @@ class Motors:
         self.frontAngle = 0
         self.backAngle = 0
 
-        self.max_s = 4;
+        self.max_s = 2;
 
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 

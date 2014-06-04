@@ -12,11 +12,12 @@ class fuzzyControl:
         #based on the angle of the robot relative to the furrow. It turns around a radius of
         #turnRadius*(30/angle), but that can be tweaked depending on experimental results
     def fuzzyAngle(self, angle):
-        return [self.desiredSpeed*(1 - (angle/30) * self.robotWidth/(2 * self.turnRadius)),
-                self.desiredSpeed*(1 + (angle/30) * self.robotWidth/(2 * self.turnRadius))]
+        return [self.desiredSpeed*(1 - (angle/20) * self.robotWidth/(2 * self.turnRadius)),
+                self.desiredSpeed*(1 + (angle/20) * self.robotWidth/(2 * self.turnRadius))]
 
         #Pass the function four ultrasound measurements [fl, fr, bl, br]
-    def fuzzyFindDist(self, ultrasoundMeasurements):
+    @staticmethod
+    def fuzzyFindDist(ultrasoundMeasurements):
         return [(ultrasoundMeasurements[0] + ultrasoundMeasurements[2])/2,
                 (ultrasoundMeasurements[1] + ultrasoundMeasurements[3])/2]
 
@@ -35,11 +36,11 @@ class fuzzyControl:
             speedDiff = speedDiff + center/2
         else:
             speedDiff = 0
-        return [self.desiredSpeed*(1 - (speedDiff/30) * self.robotWidth/(2 * self.turnRadius)),
-            self.desiredSpeed*(1 + (speedDiff/30) * self.robotWidth/(2 * self.turnRadius))]
+        return [self.desiredSpeed*(1 - (speedDiff/20) * self.robotWidth/(2 * self.turnRadius)),
+            self.desiredSpeed*(1 + (speedDiff/20) * self.robotWidth/(2 * self.turnRadius))]
 
     #simply runs all of the functions
     def fuzzy(self, angle, ultrasoundMeasurements):
         fd = self.fuzzyDist(ultrasoundMeasurements)
         fa = self.fuzzyAngle(angle)
-        return [fd[0] + fa[0], fd[1] + fa[1]]
+        return [(fd[0] + fa[0])/2, (fd[1] + fa[1])/2]
