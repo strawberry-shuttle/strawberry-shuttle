@@ -40,6 +40,8 @@ class Motors:
         self.frontAngle = 0
         self.backAngle = 0
 
+        self.max_s = 4;
+
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 
     def __revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
@@ -64,6 +66,10 @@ class Motors:
         self.back_motors.m2_forward(0)
 
     def moveForward(self, left, right):
+        if left > self.max_s:
+            left = self.max_s
+        if right > self.max_s:
+            right = self.max_s
         left = self.__revToPulses(abs(left))
         right = self.__revToPulses(abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
@@ -174,9 +180,6 @@ class Motors:
         backBatteryVoltage = self.back_motors.read_main_battery() / 10
         print "Front Voltage Reading:", frontBatteryVoltage, "V"
         print "Back  Voltage Reading:", backBatteryVoltage, "V"
-
-        print
-
         frontBatterySettings = self.front_motors.read_main_battery_settings()
         backBatterySettings = self.back_motors.read_main_battery_settings()
         print "Low Voltage Cutoff - Front:", frontBatterySettings[0] / 10, "V Back:", backBatterySettings[0] / 10, "V"
