@@ -17,14 +17,16 @@ from misc.mechInfo import overallTransferFunction
 
 # Implements a linear Kalman filter.
 class KalmanFilter(object):
-    # I know, I know, VIJAY: you can turn this into a readme if you want, but nice to have now, while working on it
-    # A: State transition matrix.
-    # B: Control matrix.
-    # H: Observation matrix.
-    # current_state_estimate: state estimate.
-    # current_prob_estimate: covariance estimate.
-    # Q: Estimated error in process.
-    # R: Estimated error in measurements.
+    '''
+     I know, I know, VIJAY: you can turn this into a readme if you want, but nice to have now, while working on it
+     A: State transition matrix.
+     B: Control matrix.
+     H: Observation matrix.
+     current_state_estimate: state estimate.
+     current_prob_estimate: covariance estimate.
+     Q: Estimated error in process.
+     R: Estimated error in measurements.
+    '''
     def __init__(self,ultrasonicAngle):
         self.A, self.B, self.H, self.current_state_estimate, \
             self.current_prob_estimate, self.Q, self.R = self.setUpMatrices(ultrasonicAngle)
