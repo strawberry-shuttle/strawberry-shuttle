@@ -62,8 +62,8 @@ class KalmanFilter(object):
 
     @staticmethod
     def setUpMatrices(ultrasonicAngle):
-        placeError = 0.001  # human error in placing robot straight in field
-        motorSpinError = 0.00001
+        placeError = 0.01  # human error in placing robot straight in field
+        motorSpinError = 0.1
         processNoise = 0.01
         measNoise = 0.001
         dt = 0  # we don't know this yet but we will correct it before needed
@@ -73,7 +73,7 @@ class KalmanFilter(object):
         B = np.matrix([[0], [1]])
         # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],
         #[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]])
-        H = np.matrix([[1, 0], [1, 0], [1, 0], [0, 1]])
+        H = np.matrix([[1, 0], [1, 0], [1, 0],[1,0],[0,1], [0, 1]]) #[1,0] for every angle meas and [0,1] for every speed diff meas
         x = np.matrix([[ultrasonicAngle], [0]])  # [theta, wdiff]
         P = np.matrix([[placeError, 0], [0, motorSpinError]])
         #TODO fix q and r

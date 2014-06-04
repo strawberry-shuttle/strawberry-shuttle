@@ -68,12 +68,11 @@ class Control:
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
-        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle], [backEncoderAngle],
+        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle],[frontEncoderAngle] [backEncoderAngle],[speedDiffFront],
                           [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
         measVector = self.getMeasurements()
-        #measVector[1] = measVector[0] #COMMENT THIS OUT WHEN THE RIGHT ULTRASONICS FIXED
         controlVector = np.matrix([[self.commandedRPSDiff]])
         self.kalman.Step(controlVector, measVector)
         self.curAngle = self.kalman.getCurrentAngle()
@@ -83,6 +82,7 @@ class Control:
         scaledSpeed = self.desiredSpeed * self.obstacleSpeedScaling()  # slow robot if obstacle detected
         self.commandedRPSDiff = self.determineSpeedInput()  # get differential steering data from meas/kalman/pid
         speedIncrement = self.commandedRPSDiff / 2
+
         if self.stateManager.currentState == State.moveForward:
             self.motors.moveForward(scaledSpeed + speedIncrement, scaledSpeed - speedIncrement)
         elif self.stateManager.currentState == State.moveBackward:
@@ -91,16 +91,16 @@ class Control:
     def run(self):  # Main function
         while True:
             #TODO: Get information from cameras
-            print "distances", self.ultrasonicSensors.updateDistances()
-            print "maxspeed",self.motors.maxSpeed()
-            print "\nus"
-            for angle in self.ultrasonicSensors.calculateAngle():
-                print angle * 180.0 / math.pi
-            print "\nkalman angle"
-            print self.curAngle * 180.0 / math.pi  
-            print self.commandedRPSDiff, self.commandedRPSDiff / 2
-            print "left wheel", self.desiredSpeed * self.obstacleSpeedScaling() + self.commandedRPSDiff / 2
-            print "right wheel", self.desiredSpeed * self.obstacleSpeedScaling() - self.commandedRPSDiff / 2 
+            # print "distances", self.ultrasonicSensors.updateDistances()
+            # print "maxspeed",self.motors.maxSpeed()
+            # print "\nus"
+            # for angle in self.ultrasonicSensors.calculateAngle():
+            #     print angle * 180.0 / math.pi
+            # print "\nkalman angle"
+            # print self.curAngle * 180.0 / math.pi
+            # print self.commandedRPSDiff, self.commandedRPSDiff / 2
+            # print "left wheel", self.desiredSpeed * self.obstacleSpeedScaling() + self.commandedRPSDiff / 2
+            # print "right wheel", self.desiredSpeed * self.obstacleSpeedScaling() - self.commandedRPSDiff / 2
             #time.sleep(0.5)
             self.buttons.updateButtonStates()  # TODO: Testing button states
             self.stateManager.updateState(self.buttons.buttonState, False)#self.ultrasonicSensors.endOfFurrow())
