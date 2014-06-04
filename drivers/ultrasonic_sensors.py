@@ -121,6 +121,6 @@ class UltrasonicSensors:
 
     def endOfFurrow(self):  # TODO: Test
         distEOF = mechInfo.distForNoFurrow  # cm, distances greater than this are assumed to be at the end of the furrow
-        if self.frontLeftDistance.median > distEOF and self.frontRightDistance.median > distEOF or self.backLeftDistance.median > distEOF and self.backRightDistance.median > distEOF:
+        if (self.frontLeftDistance.median > distEOF and self.backLeftDistance.median > distEOF) or (self.frontRightDistance.median > distEOF and self.backRightDistance.median > distEOF):
             return
         return False

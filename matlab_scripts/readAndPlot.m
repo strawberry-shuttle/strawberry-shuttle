@@ -4,7 +4,7 @@ if length(varargin)> 3
     error('Only three input args allowed')
 end
 
-optargs = {'./TestResults5/','timedata.txt','RPS_TimeResponse1.txt'};
+optargs = {'./TestResults6/','timedata.txt','RPS_TimeResponse1.txt'};
 optargs(1:length(varargin)) = varargin;
 [directory, tfilename, filename] = optargs{:};
 disp(directory);

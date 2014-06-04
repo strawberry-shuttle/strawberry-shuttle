@@ -12,7 +12,8 @@ from drivers.buttons import Buttons
 from misc import mechInfo
 from misc.log import Log
 import numpy as np
-import subprocess
+import math
+#import subprocess
 
 #POSITIVEW RPS DIFF MEANS LEFT WHEEL MOVING FASTER THAN RIGHT
 #Positive angle means turned to right
@@ -45,7 +46,7 @@ class Control:
         self.buttons = Buttons()
         self.minSpeed = 0.0
         self.maxSpeed = self.motors.maxSpeed()
-        self.PID = PIDControl(0, (2, 0.01, 1.1),(self.minSpeed,self.maxSpeed))  # update these values
+        self.PID = PIDControl(0, (1.5,0.3,3),(self.minSpeed,self.maxSpeed))  # update these values
         self.ultrasonicSensors.updateDistances()
         self.curAngle = np.mean(self.ultrasonicSensors.calculateAngle())
         self.kalman = KalmanFilter(self.curAngle)
@@ -67,7 +68,7 @@ class Control:
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
-        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle],[frontEncoderAngle] [backEncoderAngle],[speedDiffFront],
+        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle],[frontEncoderAngle], [backEncoderAngle],[speedDiffFront],
                           [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):
@@ -89,12 +90,15 @@ class Control:
 
     def run(self):  # Main function
         while True:
+            l = Log()
+            l.ShowDebug("the angle is %0.2f" % (self.curAngle*180 / math.pi));
+            l.ShowDebug("the speed diff is %.2f" % self.commandedRPSDiff);
             self.ultrasonicSensors.updateDistances()
-            cam = subprocess.Popen("./camera/test_cs525.py")
+            #cam = subprocess.Popen("./camera/test_cs525.py")
             self.buttons.updateButtonStates()
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
             if not (self.stateManager.currentState & State.stopped):  # Robot not stopped
-                cam.wait() #Wait for camera to be done only if we're in the move state
+                #cam.wait() #Wait for camera to be done only if we're in the move state
                 self.moveInFurrow()  # Handles all the navigation, speeds, etc...
             else:  # TODO: Don't stop motors repeatedly, doing this repeatedly might send too many serial packets to the Roboclaw
                 if self.stateManager.currentState & State.canceled:
