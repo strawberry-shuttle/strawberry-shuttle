@@ -70,6 +70,10 @@ class Motors:
             left = self.max_s
         if right > self.max_s:
             right = self.max_s
+        if left < 0:
+            left = 0
+        if right < 0:
+            right = 0
         left = self.__revToPulses(abs(left))
         right = self.__revToPulses(abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
@@ -78,6 +82,15 @@ class Motors:
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def moveBackward(self, left, right):
+        if left > self.max_s:
+            left = self.max_s
+        if right > self.max_s:
+            right = self.max_s
+        if left < 0:
+            left = 0
+        if right < 0:
+            right = 0
+
         left = self.__revToPulses(-abs(left))
         right = self.__revToPulses(-abs(right))
         self.front_motors.set_m1_speed_accel(self.acceleration, left)

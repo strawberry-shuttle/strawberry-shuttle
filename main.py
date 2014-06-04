@@ -64,7 +64,6 @@ class Control:
             return 0 #Should never happen, will force stop
 
     def getMeasurements(self):
-        self.ultrasonicSensors.updateDistances()
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
         backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
@@ -90,6 +89,7 @@ class Control:
 
     def run(self):  # Main function
         while True:
+            self.ultrasonicSensors.updateDistances()
             cam = subprocess.Popen("./camera/test_cs525.py")
             self.buttons.updateButtonStates()
             self.stateManager.updateState(self.buttons.buttonState, self.ultrasonicSensors.endOfFurrow())
