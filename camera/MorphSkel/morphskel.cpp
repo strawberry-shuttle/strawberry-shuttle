@@ -74,8 +74,8 @@ int main(int argc, char** argv)
     for(int i = 0; i < FILTER_COUNT; i++)
     {
 	  erode(img, eroded, element);
-	  dilate(eroded, temp, element);
-	  subtract(img, temp, temp);
+//	  dilate(eroded, temp, element);
+//	  subtract(img, temp, temp);
 	  eroded.copyTo(img);
 	  imshow( "Display window", img );
     }
