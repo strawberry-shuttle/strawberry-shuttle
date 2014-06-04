@@ -23,8 +23,8 @@ def test(numMeas):
     for i in range(numMeas):
         ultrasonicSensors.updateDistances()
         rawData[0,i], rawData[1,i] = ultrasonicSensors.calculateAngle() #right and left ultrasonic sensor
-        rawData[2,i], rawData[3,i] = motors.getEncoderAngles(0) #front angle then back
-        rawData[4,i], rawData[5,i] = motors.getSpeedDiff() #front diff, then back
+        # rawData[2,i], rawData[3,i] = motors.getEncoderAngles(0) #front angle then back
+        rawData[2,i], rawData[3,i] = motors.getSpeedDiff() #front diff, then back
         time.sleep(0.1)
 
 

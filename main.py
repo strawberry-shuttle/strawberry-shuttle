@@ -66,9 +66,9 @@ class Control:
 
     def getMeasurements(self):
         leftUltrasonicAngle, rightUltrasonicAngle = self.ultrasonicSensors.calculateAngle()
-        backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
+        # backEncoderAngle, frontEncoderAngle = self.motors.getEncoderAngles(self.curAngle)
         speedDiffFront, speedDiffBack = self.motors.getSpeedDiff()
-        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle],[frontEncoderAngle], [backEncoderAngle],[speedDiffFront],
+        return np.matrix([[leftUltrasonicAngle], [rightUltrasonicAngle],[speedDiffFront],
                           [speedDiffBack]])  # camera angle eventually
 
     def determineSpeedInput(self):

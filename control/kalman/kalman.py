@@ -65,7 +65,7 @@ class KalmanFilter(object):
         placeError = 0.01  # human error in placing robot straight in field
         motorSpinError = 0.1
         processNoise = 0.01
-        measNoise = 0.001
+        # measNoise = 0.001
         dt = 0  # we don't know this yet but we will correct it before needed
         #G = radius_of_wheel / width of robot
 
@@ -73,7 +73,7 @@ class KalmanFilter(object):
         B = np.matrix([[0], [1]])
         # for reference z = np.matrix([[leftUltrasonicAngle],[rightUltrasonicAngle],
         #[backEncoderAngle], [frontEncoderAngle], [speedDiffFront],[speedDiffBack]])
-        H = np.matrix([[1, 0], [1, 0], [1, 0],[1,0],[0,1], [0, 1]]) #[1,0] for every angle meas and [0,1] for every speed diff meas
+        H = np.matrix([[1, 0], [1, 0],[0,1], [0, 1]]) #[1,0] for every angle meas and [0,1] for every speed diff meas
         x = np.matrix([[ultrasonicAngle], [0]])  # [theta, wdiff]
         P = np.matrix([[placeError, 0], [0, motorSpinError]])
         #TODO fix q and r
