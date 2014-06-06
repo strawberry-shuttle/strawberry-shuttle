@@ -14,6 +14,11 @@ import time
 class Motors:
 
     def __init__(self, acceleration=1):
+        """Initializes Serial (UART) communication to motor controllers
+
+        Sets up motor controller PID coefficients
+        Specifies what the encoder readings should be when the motors are receiving max voltage in order to scale speeds correctly
+        """
         UART.setup("UART1")
         UART.setup("UART2")
 
@@ -42,62 +47,67 @@ class Motors:
 
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 
-    def __revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
+    def __revToPulses(self, revolutions):
+        """Convert revolutions per second to pulses per second"""
         return int(revolutions * self.encoderResolution)
 
-    def __pulsesToRev(self, pulses):  # Convert pulses per second to revolutions per second
+    def __pulsesToRev(self, pulses):
+        """Convert pulses per second to revolutions per second"""
         return pulses / self.encoderResolution
 
     def maxSpeed(self):
+        """Returns the speed in revolutions per second where the motors are given max voltage"""
         return self.__pulsesToRev(self.maxPulsesPerSecond)
 
-    def stop(self):  # Stop with deceleration
+    def stop(self):
+        """Stop with deceleration"""
         self.front_motors.set_m1_speed_accel(self.acceleration, 0)
         self.front_motors.set_m2_speed_accel(self.acceleration, 0)
         self.back_motors.set_m1_speed_accel(self.acceleration, 0)
         self.back_motors.set_m2_speed_accel(self.acceleration, 0)
 
-    def estop(self):  # Stop instantly
+    def estop(self):
+        """Stop instantly with no deceleration"""
         self.front_motors.m1_forward(0)
         self.front_motors.m2_forward(0)
         self.back_motors.m1_forward(0)
         self.back_motors.m2_forward(0)
 
-    def moveForward(self, left, right):
+    def move(self, left, right):
+        """Moves the robot forward (positive values) or backwards (negative values). Accepts speeds in pulses per second. Speeds are limited by mechInfo.speedLimit"""
         if left > mechInfo.speedLimit:
             left = mechInfo.speedLimit
         if right > mechInfo.speedLimit:
             right = mechInfo.speedLimit
-        if left < 0:
-            left = 0
-        if right < 0:
-            right = 0
-        left = self.__revToPulses(abs(left))
-        right = self.__revToPulses(abs(right))
+        if left < -mechInfo.speedLimit:
+            left = -mechInfo.speedLimit
+        if right < -mechInfo.speedLimit:
+            right = -mechInfo.speedLimit
+        left = self.__revToPulses(left)
+        right = self.__revToPulses(right)
         self.front_motors.set_m1_speed_accel(self.acceleration, left)
         self.front_motors.set_m2_speed_accel(self.acceleration, right)
         self.back_motors.set_m1_speed_accel(self.acceleration, left)
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
+
+    def moveForward(self, left, right):
+        """Moves the robot forward. Accepts speeds in pulses per second. Speeds less than zero are set to 0"""
+        if left < 0:
+            left = 0
+        if right < 0:
+            right = 0
+        self.move(left, right)
 
     def moveBackward(self, left, right):
-        if left > mechInfo.speedLimit:
-            left = mechInfo.speedLimit
-        if right > mechInfo.speedLimit:
-            right = mechInfo.speedLimit
+        """Moves the robot backward. Accepts speeds in pulses per second. Speeds less than zero are set to 0"""
         if left < 0:
             left = 0
         if right < 0:
             right = 0
-
-        left = self.__revToPulses(-abs(left))
-        right = self.__revToPulses(-abs(right))
-        self.front_motors.set_m1_speed_accel(self.acceleration, left)
-        self.front_motors.set_m2_speed_accel(self.acceleration, right)
-        self.back_motors.set_m1_speed_accel(self.acceleration, left)
-        self.back_motors.set_m2_speed_accel(self.acceleration, right)
+        self.move(-left, -right)
 
     def __readEncoderSpeedsPPS(self):
-        #Read speeds in pulses per second
+        """Read speeds from the encoders in pulses per second"""
         leftFront = self.front_motors.read_m1_speed()[0]
         rightFront = self.front_motors.read_m2_speed()[0]
         leftBack = self.back_motors.read_m1_speed()[0]
@@ -106,10 +116,11 @@ class Motors:
         return leftFront, rightFront, leftBack, rightBack  # Returns values in pulses per second
 
     def readEncoderSpeeds(self):
-        #Read speeds in pulses per second
+        """Read speeds from the encoders in revolutions per second"""
         return map(self.__pulsesToRev, self.__readEncoderSpeedsPPS())  # Returns values in revolutions per second
 
     def __readEncoderDistanceTraveledPulses(self):
+        """Returns the number of pulses read from the encoders since the last time this method was called"""
         underflowConst = 0b00000001
         overflowConst = 0b00000100
         maxCount = 4294967295
@@ -156,6 +167,7 @@ class Motors:
         return frontLeftDiff, frontRightDiff, backLeftDiff, backRightDiff  # Returns values in number of pulses
 
     def readEncoderDistanceTraveled(self):
+        """Returns the number of revolutions the wheels have turned since the last time this method was called"""
         return map(self.__pulsesToRev, self.__readEncoderDistanceTraveledPulses())  # Returns values in number of revolutions
 
     @staticmethod
@@ -166,27 +178,32 @@ class Motors:
         return (leftDistTravelled - rightDistTravelled) / mechInfo.robotWidth
 
     def getEncoderAngles(self, currentAngleEstimate):
+        """Takes current heading angle estimate and adds the current angle that the robot is moving in"""
         leftFrontDiff, rightFrontDiff, leftBackDiff, rightBackDiff = self.readEncoderDistanceTraveled()
         self.frontAngle = currentAngleEstimate + self.__getDiffAngle(leftFrontDiff, rightFrontDiff)
         self.backAngle = currentAngleEstimate + self.__getDiffAngle(leftBackDiff, rightBackDiff)
         return [self.frontAngle, self.backAngle]
 
     def getSpeedDiff(self):
+        """Returns difference between left and right wheels for each set of wheels (front and back). Positive values mean the left wheels are moving faster"""
         leftFront, rightFront, leftBack, rightBack = self.readEncoderSpeeds()
         return leftFront - rightFront, leftBack - rightBack
 
     def printCurrents(self):
+        """Prints the current that each motor is currently drawing"""
         m1cur, m2cur = self.front_motors.read_currents()
         print "Front Currents - Left: ", m1cur/100.0, "A Right: ", m2cur/100.0, "A"
         m1cur, m2cur = self.back_motors.read_currents()
         print "Back  Currents - Left: ", m1cur/100.0, "A Right: ", m2cur/100.0, "A"
 
     def printEncoderSpeeds(self):
+        """Prints the speeds of all the encoders in revolutions per second"""
         frontLeft, frontRight, backLeft, backRight = self.readEncoderSpeeds()
         print "Front Speeds - Left: ", frontLeft, " rev/sec Right: ", frontRight, " rev/sec"
         print "Back  Speeds - Left: ", backLeft, " rev/sec Right: ", backRight, " rev/sec"
 
     def printBatteryInfo(self):
+        """Prints current voltages and the set low voltage cuttoffs"""
         frontBatteryVoltage = self.front_motors.read_main_battery() / 10
         backBatteryVoltage = self.back_motors.read_main_battery() / 10
         print "Front Voltage Reading:", frontBatteryVoltage, "V"
@@ -195,10 +212,3 @@ class Motors:
         backBatterySettings = self.back_motors.read_main_battery_settings()
         print "Low Voltage Cutoff - Front:", frontBatterySettings[0] / 10, "V Back:", backBatterySettings[0] / 10, "V"
         print "High Voltage Cutoff - Front:", frontBatterySettings[1] / 10, "V Back:", backBatterySettings[1] / 10, "V"
-
-
-if __name__ == "__main__":
-    m = Motors()
-    m.front_motors.m1_forward(50)
-    time.sleep(2)
-    m.front_motors.m1_forward(0)
