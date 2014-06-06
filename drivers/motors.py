@@ -40,8 +40,6 @@ class Motors:
         self.frontAngle = 0
         self.backAngle = 0
 
-        self.max_s = 2;
-
         self.readEncoderDistanceTraveled()  # Clears junk output from this function
 
     def __revToPulses(self, revolutions):  # Convert revolutions per second to pulses per second
@@ -66,10 +64,10 @@ class Motors:
         self.back_motors.m2_forward(0)
 
     def moveForward(self, left, right):
-        if left > self.max_s:
-            left = self.max_s
-        if right > self.max_s:
-            right = self.max_s
+        if left > mechInfo.speedLimit:
+            left = mechInfo.speedLimit
+        if right > mechInfo.speedLimit:
+            right = mechInfo.speedLimit
         if left < 0:
             left = 0
         if right < 0:
@@ -82,10 +80,10 @@ class Motors:
         self.back_motors.set_m2_speed_accel(self.acceleration, right)
 
     def moveBackward(self, left, right):
-        if left > self.max_s:
-            left = self.max_s
-        if right > self.max_s:
-            right = self.max_s
+        if left > mechInfo.speedLimit:
+            left = mechInfo.speedLimit
+        if right > mechInfo.speedLimit:
+            right = mechInfo.speedLimit
         if left < 0:
             left = 0
         if right < 0:
