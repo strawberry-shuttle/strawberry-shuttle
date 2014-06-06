@@ -1,0 +1,11 @@
+#Place in /lib/systemd/system/
+
+[Unit]
+Description=Runs Strawberry Shuttle main function
+
+[Service]
+ExecStart=/home/root/hva-prototype/main.py
+SyslogIdentifier=strawberry_shuttle
+
+[Install]
+WantedBy=multi-user.target
