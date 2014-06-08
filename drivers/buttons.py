@@ -1,4 +1,3 @@
-#TODO: Test
 from __future__ import division
 __author__ = 'Scotty Waggoner'
 
@@ -6,6 +5,19 @@ import Adafruit_BBIO.GPIO as GPIO
 from misc.log import Log
 
 class ButtonState:
+    """ButtonState class
+    
+    Effectively an enum for readability and convenience when handling buttons.
+    
+    Possible buttons are:
+    
+    noBtn
+    stopBtn
+    forwardBtn
+    backBtn
+    frontBumper
+    backBumper
+    """
     noBtn = 0
     stopBtn = 1
     forwardBtn = 2 #  Send in back and Follow in front
@@ -14,8 +26,18 @@ class ButtonState:
     backBumper = 16
 
 class Buttons:
-
+    """Button input handling class.
+    
+    Class that handles configuration and button states.
+    """
     def __init__(self):
+        """
+        
+        Input: N/A
+        Output: N/A
+        
+        Constructor for button handler class. Configures pins for I/O. See BBB_Pinouts for BBB wiring configuration.
+        """
         GPIO.setup("P8_7", GPIO.IN)   # Front Bumper
         GPIO.setup("P8_8", GPIO.IN)   # Back Bumper
         GPIO.setup("P8_9", GPIO.IN)   # Forward Button
@@ -31,6 +53,14 @@ class Buttons:
         self.buttonState = ButtonState.noBtn
 
     def updateButtonStates(self):
+        """
+        
+        Input: N/A
+        Output: int(self.buttonState)
+        
+        Check input pins for button presses and record them into button state, and then return it.
+        
+        """    
         self.buttonState = ButtonState.noBtn
         if GPIO.event_detected("P8_7"):
             self.buttonState |= ButtonState.frontBumper
@@ -42,6 +72,6 @@ class Buttons:
             self.buttonState |= ButtonState.backBtn
         if GPIO.event_detected("P8_11"):
             self.buttonState |= ButtonState.stopBtn
-	l = Log()
-	# l.ShowDebug("ButtonState: %d" % self.buttonState)
+        #l = Log()
+        #l.ShowDebug("ButtonState: %d" % self.buttonState)
         return self.buttonState
