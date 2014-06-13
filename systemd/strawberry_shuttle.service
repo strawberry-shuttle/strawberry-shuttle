@@ -1,4 +1,16 @@
-#Place in /lib/systemd/system/
+# Configures the strawberry shuttle main function as a system service to allow it to run on boot
+#
+# Usage:
+# Place this file in /lib/systemd/system/
+#
+# systemctl status strawberry_shuttle  #Displays status of the service running main.py
+# systemctl stop strawberry_shuttle    #Stops the service running main.py
+# systemctl start strawberry_shuttle   #Starts the service running main.py
+# systemctl restart strawberry_shuttle #Restarts the service running main.py
+# systemctl enable strawberry_shuttle  #Enables the service that runs main.py on boot
+# systemctl disable strawberry_shuttle #Disables the service from running main.py on boot
+# journalctl -f -u strawberry_shuttle  #Displays any output or errors that main.py has while running
+
 
 [Unit]
 Description=Runs Strawberry Shuttle main function
